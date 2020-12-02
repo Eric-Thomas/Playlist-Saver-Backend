@@ -10,8 +10,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.psb.model.Playlist;
+import com.psb.model.Playlists;
 import com.psb.model.SpotifyUser;
 import com.psb.service.SpotifyService;
+
+import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/spotify")
@@ -25,8 +29,8 @@ public class SpotifyController {
 	}
 	
 	@PostMapping(path = "/playlists", consumes = {MediaType.APPLICATION_JSON_VALUE})
-	public String savePlaylist(@RequestBody SpotifyUser spotifyUser) {
-		return spotifyUser.toString();
+	public Playlists savePlaylist(@RequestBody SpotifyUser spotifyUser) {
+		return spotifyService.getPlaylists(spotifyUser.getOauthToken());
 	}
 	
 }

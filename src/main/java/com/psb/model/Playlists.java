@@ -12,4 +12,5 @@ public class Playlists {
 	private String href;
 	@JsonProperty("items")
 	List<Playlist> playlists;
+	
 }

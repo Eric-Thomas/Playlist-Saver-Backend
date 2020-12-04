@@ -11,7 +11,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Configuration
 public class SpringConfig {
 	
-	 @Value("${spotify.base.url}")
+	@Value("${spotify.base.url}")
 	private String spotifyBaseUrl;
 	
 	@Bean

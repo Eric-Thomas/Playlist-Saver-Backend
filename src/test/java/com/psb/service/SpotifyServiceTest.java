@@ -3,24 +3,19 @@ package com.psb.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.psb.model.Playlist;
 import com.psb.model.Playlists;
 import com.psb.model.Tracks;
+import com.psb.util.ResponseUtil;
 
-import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 
 @SpringBootTest
@@ -28,12 +23,15 @@ public class SpotifyServiceTest {
 	
 	private static MockWebServer mockSpotifyServer;
 	private SpotifyService spotifyService;
-	private static ObjectMapper objectMapper = new ObjectMapper();
-	 
+	private static ResponseUtil responseUtil;
+
     @BeforeAll
     static void setUp() throws IOException {
         mockSpotifyServer = new MockWebServer();
         mockSpotifyServer.start();
+        responseUtil = new ResponseUtil(
+        		String.format("http://localhost:%s", 
+                        mockSpotifyServer.getPort()));
     }
  
     @AfterAll
@@ -51,44 +49,20 @@ public class SpotifyServiceTest {
 	
 	@Test
 	void testGetPlaylists() {
-	    Playlists testProfilePlaylists = new Playlists();
-	    testProfilePlaylists.setHref("testHref");
-	    Playlist testProfilePlaylist = new Playlist();
-	    testProfilePlaylist.setHref(String.format("http://localhost:%s", 
-	            mockSpotifyServer.getPort()));
-	    testProfilePlaylist.setName("Test");
-	    Tracks testProfilePlaylistTracks = new Tracks();
-	    testProfilePlaylistTracks.setHref(String.format("http://localhost:%s", 
-	            mockSpotifyServer.getPort()));
-	    testProfilePlaylist.setTracks(testProfilePlaylistTracks);
-	    List<Playlist> testItems = new ArrayList<>();
-	    testItems.add(testProfilePlaylist);
-	    testProfilePlaylists.setPlaylists(testItems);
-	    addPlaylistsResponse(testProfilePlaylists);
-	    addTracksResponse(testProfilePlaylist.getTracks());
-		Playlists servicePlaylists = spotifyService.getPlaylists("");
-		assertEquals(testProfilePlaylists, servicePlaylists);
+		Playlists testPlaylists = responseUtil.createTestPlaylists();
+		responseUtil.addMockPlaylistsResponse(testPlaylists, mockSpotifyServer);
+		Playlists servicePlaylists = spotifyService.getPlaylists("oauthToken");
+		assertEquals(testPlaylists, servicePlaylists);
 	}
 	
-	private void addPlaylistsResponse(Playlists playlists) {
-	    try {
-			mockSpotifyServer.enqueue(new MockResponse()
-					.setBody(objectMapper.writeValueAsString(playlists))
-					.addHeader("Content-Type", "application/json"));
-		} catch (JsonProcessingException e) {
-			e.printStackTrace();
-		}
+	@Test
+	void testGetPlaylistTracks() {
+		Playlist testPlaylist = responseUtil.createTestPlaylist();
+		Tracks testTracks = responseUtil.createTestTracks();
+		responseUtil.addMockTracksResponse(testTracks, mockSpotifyServer);
+		Tracks serviceTracks = spotifyService.getPlaylistTracks("oauthToken", testPlaylist);
+		assertEquals(testTracks, serviceTracks);
 	}
-	
-	private void addTracksResponse(Tracks tracks) {
-	    try {
-			mockSpotifyServer.enqueue(new MockResponse()
-					.setBody(objectMapper.writeValueAsString(tracks))
-					.addHeader("Content-Type", "application/json"));
-		} catch (JsonProcessingException e) {
-			e.printStackTrace();
-		}
-	}
-	
+
 
 }

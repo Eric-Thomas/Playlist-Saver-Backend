@@ -18,7 +18,6 @@ import com.psb.model.Track;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 
-@SpringBootTest
 public class ResponseUtil {
 
 	private ObjectMapper objectMapper;
@@ -42,7 +41,7 @@ public class ResponseUtil {
 	public Playlist createTestPlaylist() {
 		Playlist testPlaylist = new Playlist();
 		testPlaylist.setHref(this.mockServerUrl);
-		testPlaylist.setName("Test");
+		testPlaylist.setName("Test Playlist1");
 		testPlaylist.setTracksUrl(this.mockServerUrl + "/tracks");
 		return testPlaylist;
 	}

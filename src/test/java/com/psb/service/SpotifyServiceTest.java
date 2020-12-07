@@ -1,6 +1,7 @@
 package com.psb.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 
@@ -9,6 +10,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.psb.model.Playlist;
@@ -26,7 +28,7 @@ public class SpotifyServiceTest {
 	private static ResponseUtil responseUtil;
 
     @BeforeAll
-    static void setUp() throws IOException {
+    public static void setUp() throws IOException {
         mockSpotifyServer = new MockWebServer();
         mockSpotifyServer.start();
         responseUtil = new ResponseUtil(
@@ -35,7 +37,7 @@ public class SpotifyServiceTest {
     }
  
     @AfterAll
-    static void tearDown() throws IOException {
+    public static void tearDown() throws IOException {
         mockSpotifyServer.shutdown();
     }
     
@@ -63,6 +65,6 @@ public class SpotifyServiceTest {
 		Tracks serviceTracks = spotifyService.getPlaylistTracks("oauthToken", testPlaylist);
 		assertEquals(testTracks, serviceTracks);
 	}
-
+	
 
 }

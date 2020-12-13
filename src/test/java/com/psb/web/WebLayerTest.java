@@ -21,9 +21,11 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.psb.constants.Constants;
+import com.psb.model.Playlist;
 import com.psb.model.SpotifyUser;
 import com.psb.service.SpotifyService;
-import com.psb.util.ResponseUtil;
+import com.psb.util.SpotifyUtil;
 
 @WebMvcTest
 public class WebLayerTest {
@@ -36,11 +38,11 @@ public class WebLayerTest {
 	
 	@MockBean
 	private SpotifyService service;
-	private static ResponseUtil responseUtil;
+	private static SpotifyUtil spotifyUtil;
 	
 	 @BeforeAll
 	    public static void setUp() throws IOException {
-	        responseUtil = new ResponseUtil(
+	        spotifyUtil = new SpotifyUtil(
 	        		String.format("http://localhost:%s", 
 	                        port));
 	    }
@@ -51,14 +53,16 @@ public class WebLayerTest {
 		user.setOauthToken("oauthToken");
 		user.setUsername("Eric");
 		String requestBody = new ObjectMapper().writeValueAsString(user);
-		when(service.getPlaylists(Mockito.any(String.class))).thenReturn(responseUtil.createTestPlaylists());
+		when(service.getPlaylists(Mockito.any(String.class))).thenReturn(spotifyUtil.createTestPlaylists());
+		when(service.getPlaylistTracks(Mockito.any(String.class), Mockito.any(Playlist.class))).thenReturn(spotifyUtil.createTestTracks());
 		this.mockMvc.perform(MockMvcRequestBuilders
 				.post("/spotify/playlists")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(requestBody))
 				.andDo(print())
 				.andExpect(status().isOk())
-				.andExpect(content().string(containsString("Test Playlist1")));
+				.andExpect(content().string(containsString(Constants.TEST_ARTIST_NAME)))
+				.andExpect(content().string(containsString(Constants.TEST_SONG_NAME)));
 				
 	}
 	
@@ -74,7 +78,6 @@ public class WebLayerTest {
 				.post("/spotify/playlists")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(requestBody))
-				.andDo(print())
 				.andExpect(status().isUnauthorized())
 				.andExpect(content().string(containsString("Invalid Spotify oauth token")));
 				
@@ -84,7 +87,6 @@ public class WebLayerTest {
 	public void TestNoContentTypeHeader() throws Exception {
 		this.mockMvc.perform(MockMvcRequestBuilders
 				.post("/spotify/playlists"))
-				.andDo(print())
 				.andExpect(status().isUnsupportedMediaType());
 				
 	}
@@ -95,7 +97,6 @@ public class WebLayerTest {
 				.post("/spotify/playlists")
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON))
-				.andDo(print())
 				.andExpect(status().isBadRequest());
 				
 	}

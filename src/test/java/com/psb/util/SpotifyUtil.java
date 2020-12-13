@@ -3,27 +3,26 @@ package com.psb.util;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.boot.test.context.SpringBootTest;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.psb.constants.Constants;
 import com.psb.model.Album;
 import com.psb.model.Artist;
 import com.psb.model.Playlist;
 import com.psb.model.Playlists;
-import com.psb.model.Tracks;
 import com.psb.model.Track;
+import com.psb.model.Tracks;
 
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 
-public class ResponseUtil {
+public class SpotifyUtil {
 
 	private ObjectMapper objectMapper;
 	private String mockServerUrl;
 
-	public ResponseUtil(String mockServerUrl) {
+	public SpotifyUtil(String mockServerUrl) {
 		this.objectMapper = new ObjectMapper().disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 		this.mockServerUrl = mockServerUrl;
 	}
@@ -41,14 +40,13 @@ public class ResponseUtil {
 	public Playlist createTestPlaylist() {
 		Playlist testPlaylist = new Playlist();
 		testPlaylist.setHref(this.mockServerUrl);
-		testPlaylist.setName("Test Playlist1");
-		testPlaylist.setTracksUrl(this.mockServerUrl + "/tracks");
+		testPlaylist.setName(Constants.TEST_PLAYLIST_NAME);
+		testPlaylist.setTracksUrl(this.mockServerUrl + Constants.TRACKS_URL);
 		return testPlaylist;
 	}
 
 	public Tracks createTestTracks() {
 		Tracks testTracks = new Tracks();
-		testTracks.setHref(this.mockServerUrl);
 		List<Track> tracks = new ArrayList<>();
 		tracks.add(createTestTrack());
 		testTracks.setTracks(tracks);
@@ -61,7 +59,7 @@ public class ResponseUtil {
 		List<Artist> artists = new ArrayList<>();
 		artists.add(createTestArtist());
 		testTrack.setArtists(artists);
-		testTrack.setName("Runaway");
+		testTrack.setName(Constants.TEST_SONG_NAME);
 		testTrack.setUri("Test uri");
 		return testTrack;
 		
@@ -69,13 +67,13 @@ public class ResponseUtil {
 	
 	public Album createTestAlbum() {
 		Album testAlbum = new Album();
-		testAlbum.setName("My Beautiful Dark Twisted Fantasy");
+		testAlbum.setName(Constants.TEST_ALBUM_NAME);
 		return testAlbum;
 	}
 
 	public Artist createTestArtist() {
 		Artist testArtist = new Artist();
-		testArtist.setName("Kanye");
+		testArtist.setName(Constants.TEST_ARTIST_NAME);
 		return testArtist;
 	}
 	

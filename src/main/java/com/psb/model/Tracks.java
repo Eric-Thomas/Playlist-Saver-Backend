@@ -9,7 +9,6 @@ import lombok.Data;
 @Data
 public class Tracks {
 	
-	String href;
 	@JsonProperty("items")
 	List<Track> tracks;
 

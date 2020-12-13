@@ -36,6 +36,7 @@ public class SpotifyService {
 					httpHeaders.setBearerAuth(oauthToken);
 				}).retrieve().bodyToMono(Tracks.class).block();
 		
+		
 		return tracks;
 	}
 	

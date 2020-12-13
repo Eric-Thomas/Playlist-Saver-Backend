@@ -1,4 +1,4 @@
-package com.psb.model;
+package com.psb.model.spotify;
 
 import java.util.List;
 import java.util.Map;
@@ -25,12 +25,12 @@ public class Track {
         this.name = (String) track.get("name");
         this.uri = (String) track.get("uri");
         try {
-			String json = mapper.writeValueAsString(track.get("album"));
-			Album album = mapper.readValue(json, Album.class);
+			String albumJson = mapper.writeValueAsString(track.get("album"));
+			Album album = mapper.readValue(albumJson, Album.class);
 			this.album = album;
-			String json2 = mapper.writeValueAsString(track.get("artists"));
+			String artistsJson = mapper.writeValueAsString(track.get("artists"));
 			List<Artist> artists = mapper.readValue(
-				      json2, new TypeReference<List<Artist>>() { });
+				      artistsJson, new TypeReference<List<Artist>>() { });
 			this.artists = artists;
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();

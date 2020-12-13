@@ -1,4 +1,4 @@
-package com.psb.model;
+package com.psb.model.spotify;
 
 import java.util.List;
 
@@ -9,7 +9,6 @@ import lombok.Data;
 @Data
 public class Playlists {
 
-	private String href;
 	@JsonProperty("items")
 	List<Playlist> playlists;
 	

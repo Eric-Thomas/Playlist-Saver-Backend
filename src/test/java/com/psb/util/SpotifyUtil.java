@@ -7,12 +7,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.psb.constants.Constants;
-import com.psb.model.Album;
-import com.psb.model.Artist;
-import com.psb.model.Playlist;
-import com.psb.model.Playlists;
-import com.psb.model.Track;
-import com.psb.model.Tracks;
+import com.psb.model.spotify.Album;
+import com.psb.model.spotify.Artist;
+import com.psb.model.spotify.Playlist;
+import com.psb.model.spotify.Playlists;
+import com.psb.model.spotify.Track;
+import com.psb.model.spotify.Tracks;
 
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;

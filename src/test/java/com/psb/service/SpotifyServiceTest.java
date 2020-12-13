@@ -11,9 +11,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import com.psb.model.Playlist;
-import com.psb.model.Playlists;
-import com.psb.model.Tracks;
+import com.psb.model.spotify.Playlist;
+import com.psb.model.spotify.Playlists;
+import com.psb.model.spotify.Tracks;
 import com.psb.util.SpotifyUtil;
 
 import okhttp3.mockwebserver.MockWebServer;

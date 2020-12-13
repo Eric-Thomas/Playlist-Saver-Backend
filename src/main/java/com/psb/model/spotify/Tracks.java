@@ -1,4 +1,4 @@
-package com.psb.model;
+package com.psb.model.spotify;
 
 import java.util.List;
 

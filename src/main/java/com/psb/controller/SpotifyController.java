@@ -10,10 +10,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.psb.model.Playlist;
-import com.psb.model.Playlists;
-import com.psb.model.SpotifyUser;
-import com.psb.model.Tracks;
+import com.psb.model.response.PlaylistResponse;
+import com.psb.model.response.PlaylistsResponse;
+import com.psb.model.spotify.Playlist;
+import com.psb.model.spotify.Playlists;
+import com.psb.model.spotify.SpotifyUser;
 import com.psb.service.SpotifyService;
 
 @RestController
@@ -28,14 +29,19 @@ public class SpotifyController {
 	}
 	
 	@PostMapping(path = "/playlists", consumes = {MediaType.APPLICATION_JSON_VALUE})
-	public List<Tracks> savePlaylist(@RequestBody SpotifyUser spotifyUser) {
+	public PlaylistsResponse savePlaylist(@RequestBody SpotifyUser spotifyUser) {
 		String oauthToken = spotifyUser.getOauthToken();
 		Playlists playlists = spotifyService.getPlaylists(oauthToken);
-		List<Tracks> tracks = new ArrayList<>();
+		PlaylistsResponse resp = new PlaylistsResponse();
+		List<PlaylistResponse> spotifyPlaylists = new ArrayList<>();
 		for (Playlist playlist : playlists.getPlaylists()) {
-			tracks.add(spotifyService.getPlaylistTracks(oauthToken, playlist));
+			PlaylistResponse playlistResponse = new PlaylistResponse();
+			playlistResponse.setPlaylistName(playlist.getName());
+			playlistResponse.setTracks(spotifyService.getPlaylistTracks(oauthToken, playlist));
+			spotifyPlaylists.add(playlistResponse);
 		}
-		return tracks;
+		resp.setPlaylists(spotifyPlaylists);
+		return resp;
 	}
 	
 }

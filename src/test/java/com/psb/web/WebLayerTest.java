@@ -22,8 +22,9 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.psb.constants.Constants;
-import com.psb.model.Playlist;
-import com.psb.model.SpotifyUser;
+import com.psb.model.spotify.Playlist;
+import com.psb.model.spotify.Playlists;
+import com.psb.model.spotify.SpotifyUser;
 import com.psb.service.SpotifyService;
 import com.psb.util.SpotifyUtil;
 
@@ -53,7 +54,8 @@ public class WebLayerTest {
 		user.setOauthToken("oauthToken");
 		user.setUsername("Eric");
 		String requestBody = new ObjectMapper().writeValueAsString(user);
-		when(service.getPlaylists(Mockito.any(String.class))).thenReturn(spotifyUtil.createTestPlaylists());
+		Playlists testPlaylists = spotifyUtil.createTestPlaylists();
+		when(service.getPlaylists(Mockito.any(String.class))).thenReturn(testPlaylists);
 		when(service.getPlaylistTracks(Mockito.any(String.class), Mockito.any(Playlist.class))).thenReturn(spotifyUtil.createTestTracks());
 		this.mockMvc.perform(MockMvcRequestBuilders
 				.post("/spotify/playlists")
@@ -61,6 +63,7 @@ public class WebLayerTest {
 				.content(requestBody))
 				.andDo(print())
 				.andExpect(status().isOk())
+				.andExpect(content().string(containsString(Constants.TEST_PLAYLIST_NAME)))
 				.andExpect(content().string(containsString(Constants.TEST_ARTIST_NAME)))
 				.andExpect(content().string(containsString(Constants.TEST_SONG_NAME)));
 				

@@ -4,9 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import com.psb.model.Playlist;
-import com.psb.model.Playlists;
-import com.psb.model.Tracks;
+import com.psb.model.spotify.Playlist;
+import com.psb.model.spotify.Playlists;
+import com.psb.model.spotify.Tracks;
 
 @Service
 public class SpotifyService {

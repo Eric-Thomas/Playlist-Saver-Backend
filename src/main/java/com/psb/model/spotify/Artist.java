@@ -1,9 +1,9 @@
-package com.psb.model;
+package com.psb.model.spotify;
 
 import lombok.Data;
 
 @Data
-public class Album {
+public class Artist {
 	
 	private String name;
 

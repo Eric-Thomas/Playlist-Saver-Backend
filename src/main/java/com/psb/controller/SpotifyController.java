@@ -16,6 +16,7 @@ import com.psb.model.spotify.Playlist;
 import com.psb.model.spotify.Playlists;
 import com.psb.model.spotify.SpotifyUser;
 import com.psb.service.SpotifyService;
+import com.psb.util.PlaylistFileWriter;
 
 @RestController
 @RequestMapping("/spotify")
@@ -40,6 +41,7 @@ public class SpotifyController {
 			playlistResponse.setTracks(spotifyService.getPlaylistTracks(oauthToken, playlist));
 			spotifyPlaylists.add(playlistResponse);
 		}
+		PlaylistFileWriter.writePlaylistsToFile(spotifyPlaylists);
 		resp.setPlaylists(spotifyPlaylists);
 		return resp;
 	}

@@ -30,7 +30,6 @@ public class SpotifyUtil {
 
 	public Playlists createTestPlaylists() {
 		Playlists testPlaylists = new Playlists();
-		testPlaylists.setHref(this.mockServerUrl);
 		List<Playlist> playlists = new ArrayList<>();
 		playlists.add(createTestPlaylist());
 		testPlaylists.setPlaylists(playlists);
@@ -39,7 +38,6 @@ public class SpotifyUtil {
 
 	public Playlist createTestPlaylist() {
 		Playlist testPlaylist = new Playlist();
-		testPlaylist.setHref(this.mockServerUrl);
 		testPlaylist.setName(Constants.TEST_PLAYLIST_NAME);
 		testPlaylist.setTracksUrl(this.mockServerUrl + Constants.TRACKS_URL);
 		return testPlaylist;

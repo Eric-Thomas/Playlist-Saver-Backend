@@ -11,5 +11,6 @@ public class Tracks {
 	
 	@JsonProperty("items")
 	List<Track> tracks;
+	String next;
 
 }

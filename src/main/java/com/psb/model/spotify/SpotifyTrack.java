@@ -12,12 +12,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 
 @Data
-public class Track {
+public class SpotifyTrack {
 	
 	private String name;
 	private String uri;
-	private Album album;
-	private List<Artist> artists;
+	private SpotifyAlbum album;
+	private List<SpotifyArtist> artists;
     @JsonProperty("track")
     private void unpackNested(Map<String,Object> track) {
     	ObjectMapper mapper = new ObjectMapper()
@@ -26,11 +26,11 @@ public class Track {
         this.uri = (String) track.get("uri");
         try {
 			String albumJson = mapper.writeValueAsString(track.get("album"));
-			Album album = mapper.readValue(albumJson, Album.class);
+			SpotifyAlbum album = mapper.readValue(albumJson, SpotifyAlbum.class);
 			this.album = album;
 			String artistsJson = mapper.writeValueAsString(track.get("artists"));
-			List<Artist> artists = mapper.readValue(
-				      artistsJson, new TypeReference<List<Artist>>() { });
+			List<SpotifyArtist> artists = mapper.readValue(
+				      artistsJson, new TypeReference<List<SpotifyArtist>>() { });
 			this.artists = artists;
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();

@@ -7,9 +7,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
-public class Playlists {
-
-	@JsonProperty("items")
-	List<Playlist> playlists;
+public class SpotifyTracks {
 	
+	@JsonProperty("items")
+	List<SpotifyTrack> tracks;
+	String next;
+
 }

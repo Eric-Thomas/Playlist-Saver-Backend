@@ -22,8 +22,8 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.psb.constants.Constants;
-import com.psb.model.spotify.Playlist;
-import com.psb.model.spotify.Playlists;
+import com.psb.model.spotify.SpotifyPlaylist;
+import com.psb.model.spotify.SpotifyPlaylists;
 import com.psb.model.spotify.SpotifyUser;
 import com.psb.service.SpotifyService;
 import com.psb.util.SpotifyUtil;
@@ -54,9 +54,9 @@ public class WebLayerTest {
 		user.setOauthToken("oauthToken");
 		user.setUsername("Eric");
 		String requestBody = new ObjectMapper().writeValueAsString(user);
-		Playlists testPlaylists = spotifyUtil.createTestPlaylists();
+		SpotifyPlaylists testPlaylists = spotifyUtil.createTestPlaylists();
 		when(service.getPlaylists(Mockito.any(String.class))).thenReturn(testPlaylists);
-		when(service.getPlaylistTracks(Mockito.any(String.class), Mockito.any(Playlist.class))).thenReturn(spotifyUtil.createTestTracks());
+		when(service.getPlaylistTracks(Mockito.any(String.class), Mockito.any(SpotifyPlaylist.class))).thenReturn(spotifyUtil.createTestTracks());
 		this.mockMvc.perform(MockMvcRequestBuilders
 				.post("/spotify/playlists")
 				.contentType(MediaType.APPLICATION_JSON)

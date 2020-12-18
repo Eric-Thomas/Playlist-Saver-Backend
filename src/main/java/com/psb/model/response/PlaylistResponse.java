@@ -1,6 +1,6 @@
 package com.psb.model.response;
 
-import com.psb.model.spotify.Tracks;
+import com.psb.model.spotify.SpotifyTracks;
 
 import lombok.Data;
 
@@ -8,6 +8,6 @@ import lombok.Data;
 public class PlaylistResponse {
 	
 	String playlistName;
-	Tracks tracks;
+	SpotifyTracks tracks;
 
 }

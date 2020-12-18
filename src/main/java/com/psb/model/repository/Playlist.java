@@ -1,11 +1,11 @@
-package com.psb.model.response;
+package com.psb.model.repository;
 
 import com.psb.model.spotify.SpotifyTracks;
 
 import lombok.Data;
 
 @Data
-public class PlaylistResponse {
+public class Playlist {
 	
 	String playlistName;
 	SpotifyTracks tracks;

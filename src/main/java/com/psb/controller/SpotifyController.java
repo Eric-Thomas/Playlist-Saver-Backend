@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.psb.model.response.PlaylistResponse;
-import com.psb.model.response.PlaylistsResponse;
+import com.psb.model.repository.Playlist;
+import com.psb.model.repository.Playlists;
 import com.psb.model.spotify.SpotifyPlaylist;
 import com.psb.model.spotify.SpotifyPlaylists;
 import com.psb.model.spotify.SpotifyUser;
@@ -30,13 +30,13 @@ public class SpotifyController {
 	}
 	
 	@PostMapping(path = "/playlists", consumes = {MediaType.APPLICATION_JSON_VALUE})
-	public PlaylistsResponse savePlaylist(@RequestBody SpotifyUser spotifyUser) {
+	public Playlists savePlaylist(@RequestBody SpotifyUser spotifyUser) {
 		String oauthToken = spotifyUser.getOauthToken();
 		SpotifyPlaylists playlists = spotifyService.getPlaylists(oauthToken);
-		PlaylistsResponse resp = new PlaylistsResponse();
-		List<PlaylistResponse> spotifyPlaylists = new ArrayList<>();
+		Playlists resp = new Playlists();
+		List<Playlist> spotifyPlaylists = new ArrayList<>();
 		for (SpotifyPlaylist playlist : playlists.getPlaylists()) {
-			PlaylistResponse playlistResponse = new PlaylistResponse();
+			Playlist playlistResponse = new Playlist();
 			playlistResponse.setPlaylistName(playlist.getName());
 			playlistResponse.setTracks(spotifyService.getPlaylistTracks(oauthToken, playlist));
 			spotifyPlaylists.add(playlistResponse);

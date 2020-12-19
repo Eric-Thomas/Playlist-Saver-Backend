@@ -7,7 +7,7 @@ import lombok.Data;
 @Data
 public class Playlist {
 	
-	String playlistName;
-	List<Track> tracks;
+	private String playlistName;
+	private List<Track> tracks;
 
 }

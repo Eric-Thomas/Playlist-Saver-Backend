@@ -34,15 +34,17 @@ public class SpotifyResponseConverter {
 	private List<Track> convertTracks
 	(SpotifyTracks spotifyTracks) {
 		List<Track> repositoryTracks = new ArrayList<>();
-		for (SpotifyTrack spotifyTrack : spotifyTracks.getTracks()) {
-			Track track = new Track();
-			track.setName(spotifyTrack.getName());
-			track.setUri(spotifyTrack.getUri());
-			track.setAlbum(
-					convertAlbum(spotifyTrack.getAlbum()));
-			track.setArtists(convertArtists(
-							spotifyTrack.getArtists()));
-			repositoryTracks.add(track);
+		if (spotifyTracks != null) {
+			for (SpotifyTrack spotifyTrack : spotifyTracks.getTracks()) {
+				Track track = new Track();
+				track.setName(spotifyTrack.getName());
+				track.setUri(spotifyTrack.getUri());
+				track.setAlbum(
+						convertAlbum(spotifyTrack.getAlbum()));
+				track.setArtists(convertArtists(
+								spotifyTrack.getArtists()));
+				repositoryTracks.add(track);
+			}
 		}
 		return repositoryTracks;
 				
@@ -50,17 +52,21 @@ public class SpotifyResponseConverter {
 
 	private List<Artist> convertArtists(List<SpotifyArtist> artists) {
 		List<Artist> repositoryArtists = new ArrayList<>();
-		for (SpotifyArtist spotifyArtist: artists) {
-			Artist artist = new Artist();
-			artist.setName(spotifyArtist.getName());
-			repositoryArtists.add(artist);
+		if (artists != null) {
+			for (SpotifyArtist spotifyArtist: artists) {
+				Artist artist = new Artist();
+				artist.setName(spotifyArtist.getName());
+				repositoryArtists.add(artist);
+			}
 		}
 		return repositoryArtists;
 	}
 
 	private Album convertAlbum(SpotifyAlbum album) {
 		Album repositoryAlbum = new Album();
-		repositoryAlbum.setName(album.getName());
+		if (album != null) {
+			repositoryAlbum.setName(album.getName());
+		}
 		return repositoryAlbum;
 	}
 

@@ -25,12 +25,23 @@ public class SpotifyService {
 	private static final String GET_PLAYLISTS_URL = "/me/playlists";
 	
 	public SpotifyPlaylists getPlaylists(String oauthToken){
-		SpotifyPlaylists playlists = client.get().uri(GET_PLAYLISTS_URL)
-				.headers(httpHeaders -> {
-					httpHeaders.setBearerAuth(oauthToken);
-				}).retrieve().bodyToMono(SpotifyPlaylists.class).block();
-		
-		return playlists;
+		return getPlaylistsWithPagination(oauthToken);
+	}
+	
+	private SpotifyPlaylists getPlaylistsWithPagination(String oauthToken) {
+		SpotifyPlaylists spotifyPlaylists = new SpotifyPlaylists();
+		String playlistsUrl = GET_PLAYLISTS_URL;
+		List<SpotifyPlaylist> playlistsList = new ArrayList<>();
+		while(playlistsUrl != null) {
+			SpotifyPlaylists playlists = client.get().uri(playlistsUrl)
+					.headers(httpHeaders -> {
+						httpHeaders.setBearerAuth(oauthToken);
+					}).retrieve().bodyToMono(SpotifyPlaylists.class).block();
+			playlistsList.addAll(playlists.getPlaylists());
+			playlistsUrl = playlists.getNext();
+		}
+		spotifyPlaylists.setPlaylists(playlistsList);
+		return spotifyPlaylists;
 	}
 	
 	public SpotifyTracks getPlaylistTracks(String oauthToken, SpotifyPlaylist playlist) {
@@ -38,11 +49,15 @@ public class SpotifyService {
 	}
 	
 	private SpotifyTracks getPlaylistTracksWithPagination(String oauthToken, SpotifyPlaylist playlist) {
+		System.out.println("***********************************************");
+		System.out.println("Getting " + playlist.getName() + " tracks");
+		System.out.println("***********************************************");
 		String tracksUrl = playlist.getTracksUrl();
 		SpotifyTracks tracks = new SpotifyTracks();
 		List<SpotifyTrack> tracksList = new ArrayList<>();
+		System.out.println(tracksUrl);
 		while (tracksUrl != null) {
-			System.out.println("tracksURL: " + tracksUrl);
+			System.out.println(tracksUrl);
 			SpotifyTracks tempTracks = client.get().uri(tracksUrl)
 					.headers(httpHeaders -> {
 						httpHeaders.setBearerAuth(oauthToken);
@@ -51,6 +66,9 @@ public class SpotifyService {
 			tracksUrl = tempTracks.getNext();
 		}
 		tracks.setTracks(tracksList);
+		for (SpotifyTrack spotifyTrack : tracks.getTracks()) {
+			System.out.println(spotifyTrack.getName());
+		}
 		return tracks;
 	}
 	

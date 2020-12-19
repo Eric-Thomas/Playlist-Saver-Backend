@@ -1,6 +1,6 @@
 package com.psb.model.repository;
 
-import com.psb.model.spotify.SpotifyTracks;
+import java.util.List;
 
 import lombok.Data;
 
@@ -8,6 +8,6 @@ import lombok.Data;
 public class Playlist {
 	
 	String playlistName;
-	SpotifyTracks tracks;
+	List<Track> tracks;
 
 }

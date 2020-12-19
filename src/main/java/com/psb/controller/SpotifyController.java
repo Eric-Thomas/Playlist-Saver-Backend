@@ -14,9 +14,11 @@ import com.psb.model.repository.Playlist;
 import com.psb.model.repository.Playlists;
 import com.psb.model.spotify.SpotifyPlaylist;
 import com.psb.model.spotify.SpotifyPlaylists;
+import com.psb.model.spotify.SpotifyTracks;
 import com.psb.model.spotify.SpotifyUser;
 import com.psb.service.SpotifyService;
 import com.psb.util.PlaylistFileWriter;
+import com.psb.util.SpotifyResponseConverter;
 
 @RestController
 @RequestMapping("/spotify")
@@ -36,10 +38,11 @@ public class SpotifyController {
 		Playlists resp = new Playlists();
 		List<Playlist> spotifyPlaylists = new ArrayList<>();
 		for (SpotifyPlaylist playlist : playlists.getPlaylists()) {
-			Playlist playlistResponse = new Playlist();
-			playlistResponse.setPlaylistName(playlist.getName());
-			playlistResponse.setTracks(spotifyService.getPlaylistTracks(oauthToken, playlist));
-			spotifyPlaylists.add(playlistResponse);
+			SpotifyTracks tracks = spotifyService.getPlaylistTracks(
+					oauthToken, playlist);
+			Playlist repositoryPlaylist = 
+					SpotifyResponseConverter.convertPlaylist(playlist, tracks);
+			spotifyPlaylists.add(repositoryPlaylist);
 		}
 		PlaylistFileWriter.writePlaylistsToFile(spotifyPlaylists);
 		resp.setPlaylists(spotifyPlaylists);

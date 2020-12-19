@@ -14,7 +14,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import com.psb.model.spotify.SpotifyPlaylist;
 import com.psb.model.spotify.SpotifyPlaylists;
 import com.psb.model.spotify.SpotifyTracks;
-import com.psb.util.SpotifyUtil;
+import com.psb.testUtil.SpotifyUtil;
 
 import okhttp3.mockwebserver.MockWebServer;
 
@@ -23,13 +23,13 @@ public class SpotifyServiceTest {
 	
 	private static MockWebServer mockSpotifyServer;
 	private SpotifyService spotifyService;
-	private static SpotifyUtil responseUtil;
+	private static SpotifyUtil spotifyUtil;
 
     @BeforeAll
     public static void setUp() throws IOException {
         mockSpotifyServer = new MockWebServer();
         mockSpotifyServer.start();
-        responseUtil = new SpotifyUtil(
+        spotifyUtil = new SpotifyUtil(
         		String.format("http://localhost:%s", 
                         mockSpotifyServer.getPort()));
     }
@@ -49,17 +49,17 @@ public class SpotifyServiceTest {
 	
 	@Test
 	void testGetPlaylists() {
-		SpotifyPlaylists testPlaylists = responseUtil.createTestPlaylists();
-		responseUtil.addMockPlaylistsResponse(testPlaylists, mockSpotifyServer);
+		SpotifyPlaylists testPlaylists = spotifyUtil.createTestPlaylists();
+		spotifyUtil.addMockPlaylistsResponse(testPlaylists, mockSpotifyServer);
 		SpotifyPlaylists servicePlaylists = spotifyService.getPlaylists("oauthToken");
 		assertEquals(testPlaylists, servicePlaylists);
 	}
 	
 	@Test
 	void testGetPlaylistTracks() {
-		SpotifyPlaylist testPlaylist = responseUtil.createTestPlaylist();
-		SpotifyTracks testTracks = responseUtil.createTestTracks();
-		responseUtil.addMockTracksResponse(testTracks, mockSpotifyServer);
+		SpotifyPlaylist testPlaylist = spotifyUtil.createTestPlaylist();
+		SpotifyTracks testTracks = spotifyUtil.createTestTracks();
+		spotifyUtil.addMockTracksResponse(testTracks, mockSpotifyServer);
 		SpotifyTracks serviceTracks = spotifyService.getPlaylistTracks("oauthToken", testPlaylist);
 		assertEquals(testTracks, serviceTracks);
 	}

@@ -10,6 +10,7 @@ import java.io.IOException;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -24,9 +25,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.psb.constants.Constants;
 import com.psb.model.spotify.SpotifyPlaylist;
 import com.psb.model.spotify.SpotifyPlaylists;
+import com.psb.model.spotify.SpotifyTracks;
 import com.psb.model.spotify.SpotifyUser;
 import com.psb.service.SpotifyService;
-import com.psb.util.SpotifyUtil;
+import com.psb.testUtil.RepositoryUtil;
+import com.psb.testUtil.SpotifyUtil;
+import com.psb.util.SpotifyResponseConverter;
 
 @WebMvcTest
 public class WebLayerTest {
@@ -38,8 +42,11 @@ public class WebLayerTest {
 	private MockMvc mockMvc;
 	
 	@MockBean
+	private SpotifyResponseConverter spotifyResponseConverter;
+	@MockBean
 	private SpotifyService service;
 	private static SpotifyUtil spotifyUtil;
+	private RepositoryUtil repositoryUtil = new RepositoryUtil();
 	
 	 @BeforeAll
 	    public static void setUp() throws IOException {
@@ -56,7 +63,13 @@ public class WebLayerTest {
 		String requestBody = new ObjectMapper().writeValueAsString(user);
 		SpotifyPlaylists testPlaylists = spotifyUtil.createTestPlaylists();
 		when(service.getPlaylists(Mockito.any(String.class))).thenReturn(testPlaylists);
-		when(service.getPlaylistTracks(Mockito.any(String.class), Mockito.any(SpotifyPlaylist.class))).thenReturn(spotifyUtil.createTestTracks());
+		when(service.getPlaylistTracks(Mockito.any(String.class), 
+				Mockito.any(SpotifyPlaylist.class))).thenReturn(
+						spotifyUtil.createTestTracks());
+		when(spotifyResponseConverter.convertPlaylist(Mockito.any(SpotifyPlaylist.class), 
+				Mockito.any(SpotifyTracks.class))).thenReturn(
+				repositoryUtil.createTestRepositoryPlaylist());
+		
 		this.mockMvc.perform(MockMvcRequestBuilders
 				.post("/spotify/playlists")
 				.contentType(MediaType.APPLICATION_JSON)

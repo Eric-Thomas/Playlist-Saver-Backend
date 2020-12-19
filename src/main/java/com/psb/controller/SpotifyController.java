@@ -25,10 +25,13 @@ import com.psb.util.SpotifyResponseConverter;
 public class SpotifyController {
 	
 	private SpotifyService spotifyService;
+	private SpotifyResponseConverter spotifyResponseConverter;
 	
 	@Autowired
-	public SpotifyController(SpotifyService spotifyService) {
+	public SpotifyController(SpotifyService spotifyService,
+			SpotifyResponseConverter spotifyResponseConverter) {
 		this.spotifyService = spotifyService;
+		this.spotifyResponseConverter = spotifyResponseConverter;
 	}
 	
 	@PostMapping(path = "/playlists", consumes = {MediaType.APPLICATION_JSON_VALUE})
@@ -41,7 +44,7 @@ public class SpotifyController {
 			SpotifyTracks tracks = spotifyService.getPlaylistTracks(
 					oauthToken, playlist);
 			Playlist repositoryPlaylist = 
-					SpotifyResponseConverter.convertPlaylist(playlist, tracks);
+					spotifyResponseConverter.convertPlaylist(playlist, tracks);
 			spotifyPlaylists.add(repositoryPlaylist);
 		}
 		PlaylistFileWriter.writePlaylistsToFile(spotifyPlaylists);

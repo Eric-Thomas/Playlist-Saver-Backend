@@ -24,6 +24,7 @@ import com.psb.model.spotify.SpotifyPlaylists;
 import com.psb.model.spotify.SpotifyTracks;
 import com.psb.model.spotify.SpotifyUser;
 import com.psb.service.SpotifyService;
+import com.psb.util.Compresser;
 import com.psb.util.PlaylistFileWriter;
 import com.psb.util.SpotifyResponseConverter;
 
@@ -87,7 +88,7 @@ public class SpotifyController {
 		
 		// Spotify usernames are unique, so we'll use those to identify bucket objects
 	    String objectKey = spotifyUser.getUsername();
-	    byte[] data = SerializationUtils.serialize(spotifyUser.getPlaylists());
+	    byte[] data = Compresser.compress(SerializationUtils.serialize(spotifyUser.getPlaylists()));
 		response.setKilobytes((int) data.length / 1024);
 		System.out.println("Data size: " + response.getKilobytes() + "kB");
 	    String result = "";

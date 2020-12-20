@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.util.SerializationUtils;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -28,8 +29,11 @@ import com.psb.util.Compresser;
 import com.psb.util.PlaylistFileWriter;
 import com.psb.util.SpotifyResponseConverter;
 
+import software.amazon.awssdk.core.ResponseBytes;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 
@@ -110,5 +114,26 @@ public class SpotifyController {
 	    System.out.println("Tag information: " + result);
 	    
 		return response;
+	}
+	
+	@SuppressWarnings("unchecked")
+	@GetMapping(path = "/load", consumes = {MediaType.APPLICATION_JSON_VALUE})
+	public Playlists load(@RequestBody SpotifyUser spotifyUser) {
+		Playlists playlists = new Playlists();
+		// Spotify usernames are unique, so we'll use those to identify bucket objects
+	    String objectKey = spotifyUser.getUsername();
+        try {
+        	// LMAO java doesn't have import aliasing so one RequestBody must use the fully qualified name
+            GetObjectRequest s3Request = GetObjectRequest.builder()
+                            .bucket(bucketName)
+                            .key(objectKey)
+                            .build();
+            ResponseBytes<GetObjectResponse> objectBytes = s3.getObjectAsBytes(s3Request);
+            Object object = SerializationUtils.deserialize(Compresser.decompress(objectBytes.asByteArray()));
+            playlists.setPlaylists((List<Playlist>) object);
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+        } 
+		return playlists;
 	}
 }

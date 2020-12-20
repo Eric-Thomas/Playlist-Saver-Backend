@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class S3Response {
 	
-	private int count;
+	private int kilobytes;
 	private String result;
 	private boolean success;
 

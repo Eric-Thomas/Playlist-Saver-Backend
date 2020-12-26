@@ -21,6 +21,7 @@ public class SpotifyUtil {
 
 	private ObjectMapper objectMapper;
 	private String mockServerUrl;
+	public final int PAGINATION_COUNT = 5;
 
 	public SpotifyUtil() {
 		this.objectMapper = new ObjectMapper().disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
@@ -30,6 +31,20 @@ public class SpotifyUtil {
 		this.mockServerUrl = url;
 	}
 
+	public List<SpotifyPlaylists> createTestPlaylistsWithPagination() {
+		List<SpotifyPlaylists> testPlaylistsList = new ArrayList<>();
+		for (int i = 0; i < PAGINATION_COUNT; i++) {
+			SpotifyPlaylists testPlaylists = new SpotifyPlaylists();
+			List<SpotifyPlaylist> playlists = new ArrayList<>();
+			playlists.add(createTestPlaylist());
+			testPlaylists.setPlaylists(playlists);
+			testPlaylists.setNext(mockServerUrl + Constants.TRACKS_URL);
+			testPlaylistsList.add(testPlaylists);
+		}
+		// Set last playlists next field to null to avoid infinite loop
+		testPlaylistsList.get(testPlaylistsList.size() - 1).setNext(null);
+		return testPlaylistsList;
+	}
 
 	public SpotifyPlaylists createTestPlaylists() {
 		SpotifyPlaylists testPlaylists = new SpotifyPlaylists();
@@ -44,6 +59,21 @@ public class SpotifyUtil {
 		testPlaylist.setName(Constants.TEST_PLAYLIST_NAME);
 		testPlaylist.setTracksUrl(this.mockServerUrl + Constants.TRACKS_URL);
 		return testPlaylist;
+	}
+	
+	public List<SpotifyTracks> createTestTracksWithPagination(){
+		List<SpotifyTracks> testTracksList = new ArrayList<>();
+		for (int i = 0; i < PAGINATION_COUNT; i++) {
+			SpotifyTracks testTracks = new SpotifyTracks();
+			List<SpotifyTrack> tracks = new ArrayList<>();
+			tracks.add(createTestTrack());
+			testTracks.setTracks(tracks);
+			testTracks.setNext(mockServerUrl + Constants.TRACKS_URL);
+			testTracksList.add(testTracks);
+		}
+		// Set last tracks next field to null to avoid infinite loop
+		testTracksList.get(testTracksList.size() - 1).setNext(null);
+		return testTracksList;
 	}
 
 	public SpotifyTracks createTestTracks() {
@@ -87,6 +117,18 @@ public class SpotifyUtil {
 			e.printStackTrace();
 		}
 	}
+	
+	public void addMockPlaylistsPaginationResponses(List<SpotifyPlaylists> playlistsList, MockWebServer server) {
+		for (SpotifyPlaylists playlists : playlistsList) {
+			try {
+				server.enqueue(new MockResponse()
+						.setBody(this.objectMapper.writeValueAsString(playlists))
+						.addHeader("Content-Type", "application/json"));
+			} catch (JsonProcessingException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 
 	public void addMockTracksResponse(SpotifyTracks tracks, MockWebServer server) {
 		try {
@@ -95,6 +137,18 @@ public class SpotifyUtil {
 					.addHeader("Content-Type", "application/json"));
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
+		}
+	}
+	
+	public void addMockTracksPaginationResponses(List<SpotifyTracks> tracksList, MockWebServer server) {
+		for (SpotifyTracks tracks : tracksList) {
+			try {
+				server.enqueue(new MockResponse()
+						.setBody(this.objectMapper.writeValueAsString(tracks))
+						.addHeader("Content-Type", "application/json"));
+			} catch (JsonProcessingException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 

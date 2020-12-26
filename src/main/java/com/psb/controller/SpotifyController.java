@@ -38,10 +38,10 @@ public class SpotifyController {
 	private AWSS3Client s3Client;
 	
 	@Autowired
-	public SpotifyController(SpotifyClient spotifyService,
+	public SpotifyController(SpotifyClient spotifyClient,
 			SpotifyResponseConverter spotifyResponseConverter,
 			AWSS3Client s3Client) {
-		this.spotifyClient = spotifyService;
+		this.spotifyClient = spotifyClient;
 		this.spotifyResponseConverter = spotifyResponseConverter;
 		this.s3Client = s3Client;
 	}

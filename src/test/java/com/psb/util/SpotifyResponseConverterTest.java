@@ -12,7 +12,7 @@ import com.psb.testUtil.SpotifyUtil;
 
 public class SpotifyResponseConverterTest {
 
-	private SpotifyUtil spotifyUtil = new SpotifyUtil(null);
+	private SpotifyUtil spotifyUtil = new SpotifyUtil();
 	private RepositoryUtil repositoryUtil = new RepositoryUtil();
 	private SpotifyResponseConverter spotifyResponseConverter =
 			new SpotifyResponseConverter();

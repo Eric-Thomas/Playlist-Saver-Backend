@@ -6,11 +6,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.io.IOException;
-
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -22,12 +19,13 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.psb.client.AWSS3Client;
+import com.psb.client.SpotifyClient;
 import com.psb.constants.Constants;
 import com.psb.model.spotify.SpotifyPlaylist;
 import com.psb.model.spotify.SpotifyPlaylists;
 import com.psb.model.spotify.SpotifyTracks;
 import com.psb.model.spotify.SpotifyUser;
-import com.psb.service.SpotifyService;
 import com.psb.testUtil.RepositoryUtil;
 import com.psb.testUtil.SpotifyUtil;
 import com.psb.util.SpotifyResponseConverter;
@@ -44,14 +42,15 @@ public class WebLayerTest {
 	@MockBean
 	private SpotifyResponseConverter spotifyResponseConverter;
 	@MockBean
-	private SpotifyService service;
-	private static SpotifyUtil spotifyUtil;
+	private SpotifyClient spotifyClient;
+	@MockBean
+	private AWSS3Client s3Client;
+	private SpotifyUtil spotifyUtil = new SpotifyUtil();
 	private RepositoryUtil repositoryUtil = new RepositoryUtil();
 	
-	 @BeforeAll
-	    public static void setUp() throws IOException {
-	        spotifyUtil = new SpotifyUtil(
-	        		String.format("http://localhost:%s", 
+	 @BeforeEach
+	    public void initialize(){
+	        spotifyUtil.setMockServerUrl(String.format("http://localhost:%s", 
 	                        port));
 	    }
 	
@@ -62,8 +61,8 @@ public class WebLayerTest {
 		user.setUsername("Eric");
 		String requestBody = new ObjectMapper().writeValueAsString(user);
 		SpotifyPlaylists testPlaylists = spotifyUtil.createTestPlaylists();
-		when(service.getPlaylists(Mockito.any(String.class))).thenReturn(testPlaylists);
-		when(service.getPlaylistTracks(Mockito.any(String.class), 
+		when(spotifyClient.getPlaylists(Mockito.any(String.class))).thenReturn(testPlaylists);
+		when(spotifyClient.getPlaylistTracks(Mockito.any(String.class), 
 				Mockito.any(SpotifyPlaylist.class))).thenReturn(
 						spotifyUtil.createTestTracks());
 		when(spotifyResponseConverter.convertPlaylist(Mockito.any(SpotifyPlaylist.class), 
@@ -88,7 +87,7 @@ public class WebLayerTest {
 		user.setOauthToken("Invalid oauthToken");
 		user.setUsername("Eric");
 		String requestBody = new ObjectMapper().writeValueAsString(user);
-		when(service.getPlaylists(Mockito.any(String.class)))
+		when(spotifyClient.getPlaylists(Mockito.any(String.class)))
 		.thenThrow(WebClientResponseException.Unauthorized.class);
 		this.mockMvc.perform(MockMvcRequestBuilders
 				.post("/spotify/playlists")

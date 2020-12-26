@@ -1,4 +1,4 @@
-package com.psb.service;
+package com.psb.client;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -19,19 +19,16 @@ import com.psb.testUtil.SpotifyUtil;
 import okhttp3.mockwebserver.MockWebServer;
 
 @SpringBootTest
-public class SpotifyServiceTest {
+public class SpotifyClientTest {
 	
 	private static MockWebServer mockSpotifyServer;
-	private SpotifyService spotifyService;
-	private static SpotifyUtil spotifyUtil;
+	private SpotifyClient spotifyClient;
+	private SpotifyUtil spotifyUtil = new SpotifyUtil();
 
     @BeforeAll
     public static void setUp() throws IOException {
         mockSpotifyServer = new MockWebServer();
         mockSpotifyServer.start();
-        spotifyUtil = new SpotifyUtil(
-        		String.format("http://localhost:%s", 
-                        mockSpotifyServer.getPort()));
     }
  
     @AfterAll
@@ -44,14 +41,15 @@ public class SpotifyServiceTest {
         String baseUrl = String.format("http://localhost:%s", 
           mockSpotifyServer.getPort());
         WebClient client = WebClient.create(baseUrl);
-        spotifyService = new SpotifyService(client);
+        spotifyClient = new SpotifyClient(client);
+        spotifyUtil.setMockServerUrl(baseUrl);
     }
 	
 	@Test
 	void testGetPlaylists() {
 		SpotifyPlaylists testPlaylists = spotifyUtil.createTestPlaylists();
 		spotifyUtil.addMockPlaylistsResponse(testPlaylists, mockSpotifyServer);
-		SpotifyPlaylists servicePlaylists = spotifyService.getPlaylists("oauthToken");
+		SpotifyPlaylists servicePlaylists = spotifyClient.getPlaylists("oauthToken");
 		assertEquals(testPlaylists, servicePlaylists);
 	}
 	
@@ -60,7 +58,7 @@ public class SpotifyServiceTest {
 		SpotifyPlaylist testPlaylist = spotifyUtil.createTestPlaylist();
 		SpotifyTracks testTracks = spotifyUtil.createTestTracks();
 		spotifyUtil.addMockTracksResponse(testTracks, mockSpotifyServer);
-		SpotifyTracks serviceTracks = spotifyService.getPlaylistTracks("oauthToken", testPlaylist);
+		SpotifyTracks serviceTracks = spotifyClient.getPlaylistTracks("oauthToken", testPlaylist);
 		assertEquals(testTracks, serviceTracks);
 	}
 	

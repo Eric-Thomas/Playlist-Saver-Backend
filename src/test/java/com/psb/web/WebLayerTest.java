@@ -6,9 +6,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.io.IOException;
-
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,13 +45,12 @@ public class WebLayerTest {
 	private SpotifyClient spotifyClient;
 	@MockBean
 	private AWSS3Client s3Client;
-	private static SpotifyUtil spotifyUtil;
+	private SpotifyUtil spotifyUtil = new SpotifyUtil();
 	private RepositoryUtil repositoryUtil = new RepositoryUtil();
 	
-	 @BeforeAll
-	    public static void setUp() throws IOException {
-	        spotifyUtil = new SpotifyUtil(
-	        		String.format("http://localhost:%s", 
+	 @BeforeEach
+	    public void initialize(){
+	        spotifyUtil.setMockServerUrl(String.format("http://localhost:%s", 
 	                        port));
 	    }
 	

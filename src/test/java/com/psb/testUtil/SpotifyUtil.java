@@ -22,9 +22,12 @@ public class SpotifyUtil {
 	private ObjectMapper objectMapper;
 	private String mockServerUrl;
 
-	public SpotifyUtil(String mockServerUrl) {
+	public SpotifyUtil() {
 		this.objectMapper = new ObjectMapper().disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-		this.mockServerUrl = mockServerUrl;
+	}
+	
+	public void setMockServerUrl(String url) {
+		this.mockServerUrl = url;
 	}
 
 

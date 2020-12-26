@@ -23,15 +23,12 @@ public class SpotifyClientTest {
 	
 	private static MockWebServer mockSpotifyServer;
 	private SpotifyClient spotifyClient;
-	private static SpotifyUtil spotifyUtil;
+	private SpotifyUtil spotifyUtil = new SpotifyUtil();
 
     @BeforeAll
     public static void setUp() throws IOException {
         mockSpotifyServer = new MockWebServer();
         mockSpotifyServer.start();
-        spotifyUtil = new SpotifyUtil(
-        		String.format("http://localhost:%s", 
-                        mockSpotifyServer.getPort()));
     }
  
     @AfterAll
@@ -45,6 +42,7 @@ public class SpotifyClientTest {
           mockSpotifyServer.getPort());
         WebClient client = WebClient.create(baseUrl);
         spotifyClient = new SpotifyClient(client);
+        spotifyUtil.setMockServerUrl(baseUrl);
     }
 	
 	@Test

@@ -22,12 +22,12 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.psb.client.SpotifyClient;
 import com.psb.constants.Constants;
 import com.psb.model.spotify.SpotifyPlaylist;
 import com.psb.model.spotify.SpotifyPlaylists;
 import com.psb.model.spotify.SpotifyTracks;
 import com.psb.model.spotify.SpotifyUser;
-import com.psb.service.SpotifyService;
 import com.psb.testUtil.RepositoryUtil;
 import com.psb.testUtil.SpotifyUtil;
 import com.psb.util.SpotifyResponseConverter;
@@ -44,7 +44,7 @@ public class WebLayerTest {
 	@MockBean
 	private SpotifyResponseConverter spotifyResponseConverter;
 	@MockBean
-	private SpotifyService service;
+	private SpotifyClient service;
 	private static SpotifyUtil spotifyUtil;
 	private RepositoryUtil repositoryUtil = new RepositoryUtil();
 	

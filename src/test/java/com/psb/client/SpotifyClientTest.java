@@ -1,4 +1,4 @@
-package com.psb.service;
+package com.psb.client;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import com.psb.client.SpotifyClient;
 import com.psb.model.spotify.SpotifyPlaylist;
 import com.psb.model.spotify.SpotifyPlaylists;
 import com.psb.model.spotify.SpotifyTracks;
@@ -19,10 +20,10 @@ import com.psb.testUtil.SpotifyUtil;
 import okhttp3.mockwebserver.MockWebServer;
 
 @SpringBootTest
-public class SpotifyServiceTest {
+public class SpotifyClientTest {
 	
 	private static MockWebServer mockSpotifyServer;
-	private SpotifyService spotifyService;
+	private SpotifyClient spotifyService;
 	private static SpotifyUtil spotifyUtil;
 
     @BeforeAll
@@ -44,7 +45,7 @@ public class SpotifyServiceTest {
         String baseUrl = String.format("http://localhost:%s", 
           mockSpotifyServer.getPort());
         WebClient client = WebClient.create(baseUrl);
-        spotifyService = new SpotifyService(client);
+        spotifyService = new SpotifyClient(client);
     }
 	
 	@Test

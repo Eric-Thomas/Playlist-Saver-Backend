@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.psb.client.SpotifyClient;
 import com.psb.model.repository.Playlist;
 import com.psb.model.repository.Playlists;
 import com.psb.model.repository.S3Response;
@@ -24,7 +25,6 @@ import com.psb.model.spotify.SpotifyPlaylist;
 import com.psb.model.spotify.SpotifyPlaylists;
 import com.psb.model.spotify.SpotifyTracks;
 import com.psb.model.spotify.SpotifyUser;
-import com.psb.service.SpotifyService;
 import com.psb.util.Compresser;
 import com.psb.util.PlaylistFileWriter;
 import com.psb.util.SpotifyResponseConverter;
@@ -41,7 +41,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 @RequestMapping("/spotify")
 public class SpotifyController {
 	
-	private SpotifyService spotifyService;
+	private SpotifyClient spotifyService;
 	private SpotifyResponseConverter spotifyResponseConverter;
 	
 	@Value("${aws.bucket.name}")
@@ -62,7 +62,7 @@ public class SpotifyController {
 	}
 	
 	@Autowired
-	public SpotifyController(SpotifyService spotifyService,
+	public SpotifyController(SpotifyClient spotifyService,
 			SpotifyResponseConverter spotifyResponseConverter) {
 		this.spotifyService = spotifyService;
 		this.spotifyResponseConverter = spotifyResponseConverter;

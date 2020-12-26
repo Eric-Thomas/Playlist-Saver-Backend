@@ -1,4 +1,4 @@
-package com.psb.service;
+package com.psb.client;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,12 +13,12 @@ import com.psb.model.spotify.SpotifyTrack;
 import com.psb.model.spotify.SpotifyTracks;
 
 @Service
-public class SpotifyService {
+public class SpotifyClient {
 	
     WebClient client;
 	
 	@Autowired
-	public SpotifyService(WebClient webClient) {
+	public SpotifyClient(WebClient webClient) {
 		this.client = webClient;
 	}
 	

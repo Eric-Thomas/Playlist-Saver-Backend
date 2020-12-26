@@ -10,7 +10,6 @@ import java.io.IOException;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -22,6 +21,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.psb.client.AWSS3Client;
 import com.psb.client.SpotifyClient;
 import com.psb.constants.Constants;
 import com.psb.model.spotify.SpotifyPlaylist;
@@ -44,7 +44,9 @@ public class WebLayerTest {
 	@MockBean
 	private SpotifyResponseConverter spotifyResponseConverter;
 	@MockBean
-	private SpotifyClient service;
+	private SpotifyClient spotifyClient;
+	@MockBean
+	private AWSS3Client s3Client;
 	private static SpotifyUtil spotifyUtil;
 	private RepositoryUtil repositoryUtil = new RepositoryUtil();
 	
@@ -62,8 +64,8 @@ public class WebLayerTest {
 		user.setUsername("Eric");
 		String requestBody = new ObjectMapper().writeValueAsString(user);
 		SpotifyPlaylists testPlaylists = spotifyUtil.createTestPlaylists();
-		when(service.getPlaylists(Mockito.any(String.class))).thenReturn(testPlaylists);
-		when(service.getPlaylistTracks(Mockito.any(String.class), 
+		when(spotifyClient.getPlaylists(Mockito.any(String.class))).thenReturn(testPlaylists);
+		when(spotifyClient.getPlaylistTracks(Mockito.any(String.class), 
 				Mockito.any(SpotifyPlaylist.class))).thenReturn(
 						spotifyUtil.createTestTracks());
 		when(spotifyResponseConverter.convertPlaylist(Mockito.any(SpotifyPlaylist.class), 
@@ -88,7 +90,7 @@ public class WebLayerTest {
 		user.setOauthToken("Invalid oauthToken");
 		user.setUsername("Eric");
 		String requestBody = new ObjectMapper().writeValueAsString(user);
-		when(service.getPlaylists(Mockito.any(String.class)))
+		when(spotifyClient.getPlaylists(Mockito.any(String.class)))
 		.thenThrow(WebClientResponseException.Unauthorized.class);
 		this.mockMvc.perform(MockMvcRequestBuilders
 				.post("/spotify/playlists")

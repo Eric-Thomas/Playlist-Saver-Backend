@@ -21,7 +21,7 @@ public class AWSS3Client {
 	
 	@Value("${aws.bucket.name}")
 	private String bucketName;
-	private Region region = Region.US_EAST_2;
+	private Region region = Region.US_EAST_1;
 	private S3Client s3;
 	
 	@PostConstruct

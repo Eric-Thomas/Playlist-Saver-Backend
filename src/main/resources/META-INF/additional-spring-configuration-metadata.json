@@ -1,12 +1,12 @@
 {"properties": [
   {
-    "name": "spotify.token",
-    "type": "java.lang.String",
-    "description": "A description for 'spotify.token'"
-  },
-  {
     "name": "spotify.base.url",
     "type": "java.lang.String",
-    "description": "A description for 'spotify.base.url'"
+    "description": "Base URL for all spotify API endpoints"
+  },
+  {
+    "name": "aws.bucket.name",
+    "type": "java.lang.String",
+    "description": "Bucket to save playlists to"
   }
 ]}

@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.util.SerializationUtils;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,7 +22,6 @@ import com.psb.model.spotify.SpotifyPlaylists;
 import com.psb.model.spotify.SpotifyTracks;
 import com.psb.model.spotify.SpotifyUser;
 import com.psb.util.Compresser;
-import com.psb.util.PlaylistFileWriter;
 import com.psb.util.SpotifyResponseConverter;
 
 import software.amazon.awssdk.core.ResponseBytes;
@@ -46,7 +44,7 @@ public class SpotifyController {
 		this.s3Client = s3Client;
 	}
 	
-	@PostMapping(path = "/playlists", consumes = {MediaType.APPLICATION_JSON_VALUE})
+	@GetMapping(path = "/playlists", consumes = {MediaType.APPLICATION_JSON_VALUE})
 	public Playlists savePlaylist(@RequestBody SpotifyUser spotifyUser) {
 		String oauthToken = spotifyUser.getOauthToken();
 		SpotifyPlaylists playlists = spotifyClient.getPlaylists(oauthToken);
@@ -59,7 +57,6 @@ public class SpotifyController {
 					spotifyResponseConverter.convertPlaylist(playlist, tracks);
 			spotifyPlaylists.add(repositoryPlaylist);
 		}
-		PlaylistFileWriter.writePlaylistsToFile(spotifyPlaylists);
 		resp.setPlaylists(spotifyPlaylists);
 		return resp;
 	}

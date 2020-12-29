@@ -22,7 +22,7 @@ public class SpotifyClient {
 		this.client = webClient;
 	}
 	
-	private static final String GET_PLAYLISTS_URL = "/me/playlists";
+	private static final String GET_PLAYLISTS_PATH = "/me/playlists?limit=50";
 	
 	public SpotifyPlaylists getPlaylists(String oauthToken){
 		return getPlaylistsWithPagination(oauthToken);
@@ -30,9 +30,10 @@ public class SpotifyClient {
 	
 	private SpotifyPlaylists getPlaylistsWithPagination(String oauthToken) {
 		SpotifyPlaylists spotifyPlaylists = new SpotifyPlaylists();
-		String playlistsUrl = GET_PLAYLISTS_URL;
+		String playlistsUrl = GET_PLAYLISTS_PATH;
 		List<SpotifyPlaylist> playlistsList = new ArrayList<>();
 		while(playlistsUrl != null) {
+			System.out.println("Getting playlists at " + playlistsUrl);
 			SpotifyPlaylists playlists = client.get().uri(playlistsUrl)
 					.headers(httpHeaders -> {
 						httpHeaders.setBearerAuth(oauthToken);
@@ -49,15 +50,14 @@ public class SpotifyClient {
 	}
 	
 	private SpotifyTracks getPlaylistTracksWithPagination(String oauthToken, SpotifyPlaylist playlist) {
+		String tracksUrl = playlist.getTracksUrl();
 		System.out.println("***********************************************");
 		System.out.println("Getting " + playlist.getName() + " tracks");
 		System.out.println("***********************************************");
-		String tracksUrl = playlist.getTracksUrl();
 		SpotifyTracks tracks = new SpotifyTracks();
 		List<SpotifyTrack> tracksList = new ArrayList<>();
-		System.out.println(tracksUrl);
 		while (tracksUrl != null) {
-			System.out.println(tracksUrl);
+			System.out.println("Calling endpoint " + tracksUrl);
 			SpotifyTracks tempTracks = client.get().uri(tracksUrl)
 					.headers(httpHeaders -> {
 						httpHeaders.setBearerAuth(oauthToken);
@@ -66,9 +66,6 @@ public class SpotifyClient {
 			tracksUrl = tempTracks.getNext();
 		}
 		tracks.setTracks(tracksList);
-		for (SpotifyTrack spotifyTrack : tracks.getTracks()) {
-			System.out.println(spotifyTrack.getName());
-		}
 		return tracks;
 	}
 	

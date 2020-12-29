@@ -1,5 +1,8 @@
 package com.psb.client;
 
+import java.io.File;
+import java.nio.file.Paths;
+
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
@@ -8,7 +11,10 @@ import org.springframework.stereotype.Component;
 
 import com.psb.model.repository.S3Response;
 
+import software.amazon.awssdk.auth.credentials.InstanceProfileCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
 import software.amazon.awssdk.core.ResponseBytes;
+import software.amazon.awssdk.profiles.ProfileFile;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
@@ -26,8 +32,18 @@ public class AWSS3Client {
 	
 	@PostConstruct
 	public void init() {
-		 s3 = S3Client.builder().region(region).build();
-		 System.out.println("S3 client built.");
+		ProfileFile profileFile = ProfileFile.builder()
+				.content(Paths.get("credentials"))
+				.type(ProfileFile.Type.CREDENTIALS)
+				.build();
+		ProfileCredentialsProvider provider = ProfileCredentialsProvider.builder()
+				.profileFile(profileFile)
+				.build();
+		s3 = S3Client.builder()
+			.credentialsProvider(provider)
+			.region(region)
+			.build();
+		System.out.println("S3 client built.");
 	}
 	
 	@PreDestroy

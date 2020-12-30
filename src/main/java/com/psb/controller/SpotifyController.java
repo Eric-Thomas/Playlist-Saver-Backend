@@ -10,6 +10,7 @@ import org.springframework.util.SerializationUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.SessionAttributes;
@@ -55,9 +56,8 @@ public class SpotifyController {
 		this.s3Client = s3Client;
 	}
 	
-	@GetMapping(path = "/playlists", consumes = {MediaType.APPLICATION_JSON_VALUE})
-	public Playlists savePlaylist(@RequestBody SpotifyUser spotifyUser) {
-		String oauthToken = spotifyUser.getOauthToken();
+	@GetMapping(path = "/playlists")
+	public Playlists savePlaylist(@RequestHeader String oauthToken) {
 		SpotifyPlaylists playlists = spotifyClient.getPlaylists(oauthToken);
 		Playlists resp = new Playlists();
 		List<Playlist> spotifyPlaylists = new ArrayList<>();

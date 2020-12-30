@@ -52,15 +52,23 @@ $('#login-button').click(function() {
 	window.location = url;
 });
 
+$('#playlist-button').click(function() {
+	$.ajax({
+		url: window.location.origin + '/spotify/playlists',
+		success: function(response) {
+			
+		}
+	});
+});
+
 // if an access token exists...
 if (access_token && (state == null || state !== stored_state)) {
 	alert('State mismatch authentication error!');
 } else {
 	localStorage.removeItem(STATE_KEY);
 	if (access_token) {
-		$.ajax({
-			
-		})
+		$('#login').hide();
+		$('#loggedin').show();
 	} else {
 		$('#login').show();
 		$('#loggedin').hide();

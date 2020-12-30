@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.util.SerializationUtils;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 
 import com.psb.client.AWSS3Client;
 import com.psb.client.SpotifyClient;
+import com.psb.model.repository.ApplicationProperties;
 import com.psb.model.repository.Playlist;
 import com.psb.model.repository.Playlists;
 import com.psb.model.repository.S3Response;
@@ -36,6 +38,13 @@ public class SpotifyController {
 	private SpotifyClient spotifyClient;
 	private SpotifyResponseConverter spotifyResponseConverter;
 	private AWSS3Client s3Client;
+	
+	@Value("${spotify.client.id}")
+	private String clientID;
+	@Value("${spotify.redirect.url}")
+	private String redirectURL;
+	@Value("${spotify.scope}")
+	private String scope;
 	
 	@Autowired
 	public SpotifyController(SpotifyClient spotifyClient,
@@ -82,5 +91,10 @@ public class SpotifyController {
         Object object = SerializationUtils.deserialize(Compresser.decompress(objectBytes.asByteArray()));
         playlists.setPlaylists((List<Playlist>) object);
 		return playlists;
+	}
+	
+	@GetMapping(path = "/properties")
+	public ApplicationProperties properties() {
+		return new ApplicationProperties(clientID, redirectURL, scope);
 	}
 }

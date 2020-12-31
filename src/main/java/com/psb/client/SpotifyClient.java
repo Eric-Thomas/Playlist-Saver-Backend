@@ -2,6 +2,7 @@ package com.psb.client;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,6 +24,8 @@ public class SpotifyClient {
     private String redirectUri;
     @Value("${spotify.scope}")
     private String scope;
+    
+    private Logger logger = Logger.getLogger(SpotifyClient.class.getName());
 	
 	@Autowired
 	public SpotifyClient(WebClient webClient) {
@@ -51,7 +54,7 @@ public class SpotifyClient {
 		String playlistsUrl = GET_PLAYLISTS_PATH;
 		List<SpotifyPlaylist> playlistsList = new ArrayList<>();
 		while(playlistsUrl != null) {
-			System.out.println("Getting playlists at " + playlistsUrl);
+			logger.info("Getting playlists at " + playlistsUrl);
 			SpotifyPlaylists playlists = client.get().uri(playlistsUrl)
 					.headers(httpHeaders -> {
 						httpHeaders.setBearerAuth(oauthToken);

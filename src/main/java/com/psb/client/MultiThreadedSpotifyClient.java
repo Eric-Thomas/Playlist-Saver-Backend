@@ -2,6 +2,7 @@ package com.psb.client;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -15,6 +16,7 @@ public class MultiThreadedSpotifyClient implements Runnable {
 	private String oauthToken;
 	private SpotifyPlaylist playlist;
 	private SpotifyTracks tracks;
+	private Logger logger = Logger.getLogger(MultiThreadedSpotifyClient.class.getName());
 	
 	public MultiThreadedSpotifyClient(WebClient client, String oauthToken, SpotifyPlaylist playlist){
 		this.client = client;
@@ -27,7 +29,7 @@ public class MultiThreadedSpotifyClient implements Runnable {
         try
         { 
             // Displaying the thread that is running 
-            System.out.println ("Thread " + 
+            logger.info ("Thread " + 
                   Thread.currentThread().getId() + 
                   " is running");
             this.tracks = getPlaylistTracksWithPagination();
@@ -36,20 +38,20 @@ public class MultiThreadedSpotifyClient implements Runnable {
         catch (Exception e) 
         { 
             // Throwing an exception 
-            System.out.println ("Exception is caught"); 
+            logger.info ("Exception is caught"); 
         } 
 
     } 
 	
 	private SpotifyTracks getPlaylistTracksWithPagination() {
 		String tracksUrl = playlist.getTracksUrl();
-		System.out.println("***********************************************");
-		System.out.println("Getting " + playlist.getName() + " tracks");
-		System.out.println("***********************************************");
+		logger.info("***********************************************");
+		logger.info("Getting " + playlist.getName() + " tracks");
+		logger.info("***********************************************");
 		SpotifyTracks tracks = new SpotifyTracks();
 		List<SpotifyTrack> tracksList = new ArrayList<>();
 		while (tracksUrl != null) {
-			System.out.println("Calling endpoint " + tracksUrl);
+			logger.info("Calling endpoint " + tracksUrl);
 			SpotifyTracks tempTracks = client.get().uri(tracksUrl)
 					.headers(httpHeaders -> {
 						httpHeaders.setBearerAuth(oauthToken);

@@ -1,6 +1,7 @@
 package com.psb.client;
 
 import java.nio.file.Paths;
+import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -27,6 +28,7 @@ public class AWSS3Client {
 	private String bucketName;
 	private Region region = Region.US_EAST_1;
 	private S3Client s3;
+	private Logger logger = Logger.getLogger(AWSS3Client.class.getName());
 	
 	@PostConstruct
 	public void init() {
@@ -41,13 +43,13 @@ public class AWSS3Client {
 			.credentialsProvider(provider)
 			.region(region)
 			.build();
-		System.out.println("S3 client built.");
+		logger.info("S3 client built.");
 	}
 	
 	@PreDestroy
 	public void tearDown() {
 		s3.close();
-		System.out.println("S3 client closed.");
+		logger.info("S3 client closed.");
 	}
 	
 	public S3Response saveData(byte[] data, String objectKey) {
@@ -68,8 +70,8 @@ public class AWSS3Client {
         } 
         
 		response.setKilobytes((int) data.length / 1024);
-		System.out.println("Data size: " + response.getKilobytes() + "kB");
-	    System.out.println("Tag information: " + response.getResult());
+		logger.info("Data size: " + response.getKilobytes() + "kB");
+	    logger.info("Tag information: " + response.getResult());
         
         return response;	
 	}

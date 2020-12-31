@@ -56,10 +56,7 @@ public class WebLayerTest {
 	
 	@Test
 	public void TestDefaultPlaylist() throws Exception {
-		SpotifyUser user = new SpotifyUser();
-		user.setOauthToken("oauthToken");
-		user.setUsername("Eric");
-		String requestBody = new ObjectMapper().writeValueAsString(user);
+		String oauth = "oauth";
 		SpotifyPlaylists testPlaylists = spotifyUtil.createTestPlaylists();
 		when(spotifyClient.getPlaylists(Mockito.any(String.class))).thenReturn(testPlaylists);
 		when(spotifyClient.getPlaylistTracks(Mockito.any(String.class), 
@@ -70,9 +67,9 @@ public class WebLayerTest {
 				repositoryUtil.createTestRepositoryPlaylist());
 		
 		this.mockMvc.perform(MockMvcRequestBuilders
-				.post("/spotify/playlists")
+				.get("/spotify/playlists")
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(requestBody))
+				.header("oauthToken", oauth))
 				.andDo(print())
 				.andExpect(status().isOk())
 				.andExpect(content().string(containsString(Constants.TEST_PLAYLIST_NAME)))
@@ -83,16 +80,13 @@ public class WebLayerTest {
 	
 	@Test
 	public void TestInvalidOauthToken() throws Exception {
-		SpotifyUser user = new SpotifyUser();
-		user.setOauthToken("Invalid oauthToken");
-		user.setUsername("Eric");
-		String requestBody = new ObjectMapper().writeValueAsString(user);
+		String oauth = "INVALID TOKEN";
 		when(spotifyClient.getPlaylists(Mockito.any(String.class)))
 		.thenThrow(WebClientResponseException.Unauthorized.class);
 		this.mockMvc.perform(MockMvcRequestBuilders
-				.post("/spotify/playlists")
+				.get("/spotify/playlists")
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(requestBody))
+				.header("oauthToken", oauth))
 				.andExpect(status().isUnauthorized())
 				.andExpect(content().string(containsString("Invalid Spotify oauth token")));
 				
@@ -101,15 +95,15 @@ public class WebLayerTest {
 	@Test
 	public void TestNoContentTypeHeader() throws Exception {
 		this.mockMvc.perform(MockMvcRequestBuilders
-				.post("/spotify/playlists"))
-				.andExpect(status().isUnsupportedMediaType());
+				.get("/spotify/playlists"))
+				.andExpect(status().isBadRequest());
 				
 	}
 	
 	@Test
 	public void TestInvalidBody() throws Exception {
 		this.mockMvc.perform(MockMvcRequestBuilders
-				.post("/spotify/playlists")
+				.get("/spotify/playlists")
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isBadRequest());

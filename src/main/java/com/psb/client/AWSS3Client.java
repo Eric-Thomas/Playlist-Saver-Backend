@@ -1,6 +1,5 @@
 package com.psb.client;
 
-import java.io.File;
 import java.nio.file.Paths;
 
 import javax.annotation.PostConstruct;
@@ -11,7 +10,6 @@ import org.springframework.stereotype.Component;
 
 import com.psb.model.repository.S3Response;
 
-import software.amazon.awssdk.auth.credentials.InstanceProfileCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
 import software.amazon.awssdk.core.ResponseBytes;
 import software.amazon.awssdk.profiles.ProfileFile;

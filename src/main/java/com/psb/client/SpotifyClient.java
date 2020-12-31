@@ -1,9 +1,5 @@
 package com.psb.client;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,15 +7,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClient.ResponseSpec;
 
 import com.psb.model.spotify.SpotifyPlaylist;
 import com.psb.model.spotify.SpotifyPlaylists;
 import com.psb.model.spotify.SpotifyTrack;
 import com.psb.model.spotify.SpotifyTracks;
-import com.psb.util.EncodingUtil;
-
-import reactor.core.publisher.Mono;
 
 @Component
 public class SpotifyClient {

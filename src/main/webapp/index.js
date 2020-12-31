@@ -62,7 +62,7 @@ $('#playlists-button').click(function() {
 		headers: {oauthToken: params.access_token},
 		success: function(response) {
 			console.log(response);
-			$('#loggedin').append('<h6>' + response + '</h6>')
+			$('#loggedin').append('<h6>' + JSON.stringify(response) + '</h6>')
 		},
 		error: function(response) {
 			$('playlists-button').hide();

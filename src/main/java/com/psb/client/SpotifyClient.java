@@ -10,7 +10,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.psb.model.spotify.SpotifyPlaylist;
 import com.psb.model.spotify.SpotifyPlaylists;
-import com.psb.model.spotify.SpotifyTrack;
 import com.psb.model.spotify.SpotifyTracks;
 
 @Component
@@ -65,27 +64,16 @@ public class SpotifyClient {
 	}
 	
 	public SpotifyTracks getPlaylistTracks(String oauthToken, SpotifyPlaylist playlist) {
-		return getPlaylistTracksWithPagination(oauthToken, playlist);
-	}
-	
-	private SpotifyTracks getPlaylistTracksWithPagination(String oauthToken, SpotifyPlaylist playlist) {
-		String tracksUrl = playlist.getTracksUrl();
-		System.out.println("***********************************************");
-		System.out.println("Getting " + playlist.getName() + " tracks");
-		System.out.println("***********************************************");
-		SpotifyTracks tracks = new SpotifyTracks();
-		List<SpotifyTrack> tracksList = new ArrayList<>();
-		while (tracksUrl != null) {
-			System.out.println("Calling endpoint " + tracksUrl);
-			SpotifyTracks tempTracks = client.get().uri(tracksUrl)
-					.headers(httpHeaders -> {
-						httpHeaders.setBearerAuth(oauthToken);
-					}).retrieve().bodyToMono(SpotifyTracks.class).block();
-			tracksList.addAll(tempTracks.getTracks());
-			tracksUrl = tempTracks.getNext();
+		MultiThreadedSpotifyClient threadedClient = new MultiThreadedSpotifyClient(client, oauthToken, playlist);
+		Thread thread = new Thread(threadedClient);
+		thread.start();
+		try {
+			thread.join();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		tracks.setTracks(tracksList);
-		return tracks;
+		return threadedClient.getTracks();
 	}
 	
 

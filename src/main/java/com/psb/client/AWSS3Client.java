@@ -1,20 +1,17 @@
 package com.psb.client;
 
-import java.nio.file.Paths;
 import java.util.logging.Logger;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.psb.exception.AWSS3ClientException;
 import com.psb.model.repository.S3Response;
 
-import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
 import software.amazon.awssdk.core.ResponseBytes;
-import software.amazon.awssdk.profiles.ProfileFile;
-import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
@@ -26,24 +23,12 @@ public class AWSS3Client {
 	
 	@Value("${aws.bucket.name}")
 	private String bucketName;
-	private Region region = Region.US_EAST_1;
 	private S3Client s3;
 	private Logger logger = Logger.getLogger(AWSS3Client.class.getName());
 	
-	@PostConstruct
-	public void init() {
-		ProfileFile profileFile = ProfileFile.builder()
-				.content(Paths.get("credentials"))
-				.type(ProfileFile.Type.CREDENTIALS)
-				.build();
-		ProfileCredentialsProvider provider = ProfileCredentialsProvider.builder()
-				.profileFile(profileFile)
-				.build();
-		s3 = S3Client.builder()
-			.credentialsProvider(provider)
-			.region(region)
-			.build();
-		logger.info("S3 client built.");
+	@Autowired
+	public AWSS3Client(S3Client s3) {
+		this.s3 = s3;
 	}
 	
 	@PreDestroy
@@ -52,7 +37,7 @@ public class AWSS3Client {
 		logger.info("S3 client closed.");
 	}
 	
-	public S3Response saveData(byte[] data, String objectKey) {
+	public S3Response saveData(byte[] data, String objectKey) throws AWSS3ClientException {
 		S3Response response = new S3Response();
         try {
         	// LMAO java doesn't have import aliasing so one RequestBody must use the fully qualified name
@@ -63,33 +48,26 @@ public class AWSS3Client {
                             software.amazon.awssdk.core.sync.RequestBody.fromBytes(data)); 
             response.setResult(s3Response.eTag()); // eTag is AWS's object hash, i.e. ideally unique ID
             response.setSuccess(true);
+    		response.setKilobytes((int) data.length / 1024);
+    		logger.info("Data size: " + response.getKilobytes() + "kB");
+    	    logger.info("Tag information: " + response.getResult());
+            return response;
         } catch (Exception e) {
-            System.err.println(e.getMessage());
-            response.setResult(e.getMessage());
-            response.setSuccess(false);
-        } 
-        
-		response.setKilobytes((int) data.length / 1024);
-		logger.info("Data size: " + response.getKilobytes() + "kB");
-	    logger.info("Tag information: " + response.getResult());
-        
-        return response;	
+        	throw new AWSS3ClientException("Error putting object to s3\n" + e.getMessage());
+        } 	
 	}
 	
-	public ResponseBytes<GetObjectResponse> getData(String objectKey) {
-		ResponseBytes<GetObjectResponse> objectBytes = null;
+	public ResponseBytes<GetObjectResponse> getData(String objectKey) throws AWSS3ClientException {
         try {
         	// LMAO java doesn't have import aliasing so one RequestBody must use the fully qualified name
             GetObjectRequest s3Request = GetObjectRequest.builder()
                             .bucket(bucketName)
                             .key(objectKey)
                             .build();
-            objectBytes = s3.getObjectAsBytes(s3Request);
+            return s3.getObjectAsBytes(s3Request);
         } catch (Exception e) {
-            System.err.println(e.getMessage());
+            throw new AWSS3ClientException("Error getting object from s3\n" + e.getMessage());
         } 
-        
-        return objectBytes;
 	}
 
 }

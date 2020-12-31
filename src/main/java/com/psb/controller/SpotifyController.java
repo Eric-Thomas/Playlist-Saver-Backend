@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 
 import com.psb.client.AWSS3Client;
 import com.psb.client.SpotifyClient;
+import com.psb.exception.AWSS3ClientException;
 import com.psb.model.repository.Playlist;
 import com.psb.model.repository.Playlists;
 import com.psb.model.repository.S3Response;
@@ -64,17 +65,17 @@ public class SpotifyController {
 	}
 	
 	@PutMapping(path = "/save", consumes = {MediaType.APPLICATION_JSON_VALUE})
-	public S3Response save(@RequestBody SpotifyUser spotifyUser) {
+	public S3Response save(@RequestBody SpotifyUser spotifyUser) throws AWSS3ClientException {
 		// Spotify usernames are unique, so we'll use those to identify bucket objects
 	    String objectKey = spotifyUser.getUsername();
 	    byte[] data = Compresser.compress(SerializationUtils.serialize(spotifyUser.getPlaylists()));
-	    S3Response response = s3Client.saveData(data, objectKey);
-		return response;
+	    return s3Client.saveData(data, objectKey);
+
 	}
 	
 	@SuppressWarnings("unchecked")
 	@GetMapping(path = "/load", consumes = {MediaType.APPLICATION_JSON_VALUE})
-	public Playlists load(@RequestBody SpotifyUser spotifyUser) {
+	public Playlists load(@RequestBody SpotifyUser spotifyUser) throws AWSS3ClientException {
 		Playlists playlists = new Playlists();
 		// Spotify usernames are unique, so we'll use those to identify bucket objects
 	    String objectKey = spotifyUser.getUsername();

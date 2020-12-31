@@ -18,12 +18,15 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.psb.client.AWSS3Client;
 import com.psb.client.SpotifyClient;
 import com.psb.constants.Constants;
+import com.psb.exception.AWSS3ClientException;
 import com.psb.model.spotify.SpotifyPlaylist;
 import com.psb.model.spotify.SpotifyPlaylists;
 import com.psb.model.spotify.SpotifyTracks;
+import com.psb.model.spotify.SpotifyUser;
 import com.psb.testUtil.RepositoryUtil;
 import com.psb.testUtil.SpotifyUtil;
 import com.psb.util.SpotifyResponseConverter;
@@ -46,6 +49,9 @@ public class WebLayerTest {
 	private SpotifyUtil spotifyUtil = new SpotifyUtil();
 	private RepositoryUtil repositoryUtil = new RepositoryUtil();
 	
+	private static final String OAUTH = "oauthToken";
+	private ObjectMapper mapper = new ObjectMapper();
+	
 	 @BeforeEach
 	    public void initialize(){
 	        spotifyUtil.setMockServerUrl(String.format("http://localhost:%s", 
@@ -53,8 +59,7 @@ public class WebLayerTest {
 	    }
 	
 	@Test
-	public void TestDefaultPlaylist() throws Exception {
-		String oauth = "oauth";
+	public void testDefaultPlaylist() throws Exception {
 		SpotifyPlaylists testPlaylists = spotifyUtil.createTestPlaylists();
 		when(spotifyClient.getPlaylists(Mockito.any(String.class))).thenReturn(testPlaylists);
 		when(spotifyClient.getPlaylistTracks(Mockito.any(String.class), 
@@ -67,7 +72,7 @@ public class WebLayerTest {
 		this.mockMvc.perform(MockMvcRequestBuilders
 				.get("/spotify/playlists")
 				.contentType(MediaType.APPLICATION_JSON)
-				.header("oauthToken", oauth))
+				.header("OAUTHToken", OAUTH))
 				.andDo(print())
 				.andExpect(status().isOk())
 				.andExpect(content().string(containsString(Constants.TEST_PLAYLIST_NAME)))
@@ -77,21 +82,20 @@ public class WebLayerTest {
 	}
 	
 	@Test
-	public void TestInvalidOauthToken() throws Exception {
-		String oauth = "INVALID TOKEN";
+	public void testInvalidOauthToken() throws Exception {
 		when(spotifyClient.getPlaylists(Mockito.any(String.class)))
 		.thenThrow(WebClientResponseException.Unauthorized.class);
 		this.mockMvc.perform(MockMvcRequestBuilders
 				.get("/spotify/playlists")
 				.contentType(MediaType.APPLICATION_JSON)
-				.header("oauthToken", oauth))
+				.header("OAUTHToken", OAUTH))
 				.andExpect(status().isUnauthorized())
 				.andExpect(content().string(containsString("Invalid Spotify oauth token")));
 				
 	}
 	
 	@Test
-	public void TestNoContentTypeHeader() throws Exception {
+	public void testNoContentTypeHeader() throws Exception {
 		this.mockMvc.perform(MockMvcRequestBuilders
 				.get("/spotify/playlists"))
 				.andExpect(status().isBadRequest());
@@ -99,13 +103,47 @@ public class WebLayerTest {
 	}
 	
 	@Test
-	public void TestInvalidBody() throws Exception {
+	public void testInvalidBody() throws Exception {
 		this.mockMvc.perform(MockMvcRequestBuilders
 				.get("/spotify/playlists")
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isBadRequest());
 				
+	}
+	
+	@Test
+	public void testS3GetObjectError() throws Exception {
+		when(s3Client.getData(Mockito.anyString()))
+		.thenThrow(new AWSS3ClientException("test"));
+		SpotifyUser user = spotifyUtil.createTestUser();
+		String body = mapper.writeValueAsString(user);
+		this.mockMvc.perform(MockMvcRequestBuilders
+				.get("/spotify/load")
+				.accept(MediaType.APPLICATION_JSON)
+				.contentType(MediaType.APPLICATION_JSON)
+				.header("OAUTHToken", OAUTH)
+				.content(body))
+				.andExpect(status().isServiceUnavailable())
+				.andExpect(content().string(containsString("Error calling S3. Try again later")));
+	}
+	
+	@Test
+	public void testS3PutObjectError() throws Exception {
+		when(s3Client.saveData(Mockito.any(byte[].class), Mockito.anyString()))
+		.thenThrow(new AWSS3ClientException("test"));
+		SpotifyUser user = spotifyUtil.createTestUser();
+		String body = mapper.writeValueAsString(user);
+		this.mockMvc.perform(MockMvcRequestBuilders
+				.put("/spotify/save")
+				.accept(MediaType.APPLICATION_JSON)
+				.contentType(MediaType.APPLICATION_JSON)
+				.header("OAUTHToken", OAUTH)
+				.content(body))
+				.andExpect(status().isServiceUnavailable())
+				.andExpect(content().string(containsString("Error calling S3. Try again later")));
+		
+		
 	}
 
 }

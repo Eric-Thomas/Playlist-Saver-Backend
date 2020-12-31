@@ -10,7 +10,6 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.psb.model.spotify.SpotifyPlaylist;
@@ -21,7 +20,6 @@ import com.psb.testUtil.SpotifyUtil;
 
 import okhttp3.mockwebserver.MockWebServer;
 
-@SpringBootTest
 public class SpotifyClientTest {
 	
 	private static MockWebServer mockSpotifyServer;

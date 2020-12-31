@@ -1,3 +1,12 @@
+let build_playlist_html = function(response) {
+	let html = '<ul>';
+	for (let i = 0; i < response.playlists.length; i++) {
+		html += '<li>' + response.playlists[i].playlistName + '</li>';
+	}
+	html += '</ul>';
+	return html
+}
+
 // get parameters from hash of the url
 let get_hash_params = function() {
 	let hash_params = {};
@@ -18,7 +27,6 @@ let get_random_string = function(length) {
 	}
 	return text;
 }
-
 
 let REDIRECT_KEY = 'spotify_redirect_url';
 let STATE_KEY = 'spotify_auth_state'; 
@@ -56,21 +64,21 @@ $('#login-button').click(function() {
 	window.location = url;
 });
 
-$('#playlists-button').click(function() {
+$('#load-spotify-button').click(function() {
 	$.ajax({
 		url: window.location.origin + '/spotify/playlists',
 		headers: {oauthToken: params.access_token},
 		success: function(response) {
 			console.log(response);
-			$('#loggedin').append('<h6>' + JSON.stringify(response) + '</h6>')
+			$('#playlist-container').empty()
+			$('#playlist-container').append(build_playlist_html(response))
 		},
 		error: function(response) {
-			$('playlists-button').hide();
-			
+			console.log(response);
 		}
 	});
-	$('#playlists-button').hide();
-	$('#loggedin').append($('#playlists-template').show());
+	$('#loggedin').hide();
+	$('#playlist-container').show();
 });
 
 // if an access token exists...

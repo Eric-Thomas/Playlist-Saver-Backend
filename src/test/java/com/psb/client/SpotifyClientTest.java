@@ -12,6 +12,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import com.psb.exception.SpotifyClientException;
+import com.psb.exception.SpotifyClientUnauthorizedException;
 import com.psb.model.spotify.SpotifyPlaylist;
 import com.psb.model.spotify.SpotifyPlaylists;
 import com.psb.model.spotify.SpotifyTrack;
@@ -47,7 +49,7 @@ public class SpotifyClientTest {
     }
 	
 	@Test
-	void testGetPlaylistsNoPagination() {
+	void testGetPlaylistsNoPagination() throws SpotifyClientException, SpotifyClientUnauthorizedException {
 		SpotifyPlaylists testPlaylists = spotifyUtil.createTestPlaylists();
 		spotifyUtil.addMockPlaylistsResponse(testPlaylists, mockSpotifyServer);
 		SpotifyPlaylists clientPlaylists = spotifyClient.getPlaylists("oauthToken");
@@ -55,7 +57,7 @@ public class SpotifyClientTest {
 	}
 	
 	@Test
-	void testGetPlaylistsWithPagination() {
+	void testGetPlaylistsWithPagination() throws SpotifyClientException, SpotifyClientUnauthorizedException {
 		List<SpotifyPlaylists> testPlaylistsList = spotifyUtil.createTestPlaylistsWithPagination();
 		SpotifyPlaylists testPlaylists = combinePlaylistsList(testPlaylistsList);
 		spotifyUtil.addMockPlaylistsPaginationResponses(testPlaylistsList, mockSpotifyServer);
@@ -75,7 +77,7 @@ public class SpotifyClientTest {
 	}
 	
 	@Test
-	void testGetPlaylistTracksNoPagination() {
+	void testGetPlaylistTracksNoPagination() throws SpotifyClientException {
 		SpotifyPlaylist testPlaylist = spotifyUtil.createTestPlaylist();
 		SpotifyTracks testTracks = spotifyUtil.createTestTracks();
 		spotifyUtil.addMockTracksResponse(testTracks, mockSpotifyServer);
@@ -84,7 +86,7 @@ public class SpotifyClientTest {
 	}
 	
 	@Test
-	void testGetPlaylistsTracksWithPagination() {
+	void testGetPlaylistsTracksWithPagination() throws SpotifyClientException {
 		SpotifyPlaylist testPlaylist = spotifyUtil.createTestPlaylist();
 		List<SpotifyTracks> testTracksList = spotifyUtil.createTestTracksWithPagination();
 		SpotifyTracks testTracks = combineTracksList(testTracksList);

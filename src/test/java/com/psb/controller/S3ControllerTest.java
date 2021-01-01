@@ -32,11 +32,12 @@ public class S3ControllerTest {
 	private SpotifyUtil spotifyUtil = new SpotifyUtil();
 	
 	private static final String OAUTH = "oauthToken";
+	private static final String ERROR_MESSAGE = "Test error message";
 	
 	@Test
 	public void testS3GetObjectError() throws Exception {
 		when(s3Client.getData(Mockito.anyString()))
-		.thenThrow(new AWSS3ClientException("test"));
+		.thenThrow(new AWSS3ClientException(ERROR_MESSAGE));
 		SpotifyUser user = spotifyUtil.createTestUser();
 		String body = mapper.writeValueAsString(user);
 		this.mockMvc.perform(MockMvcRequestBuilders
@@ -46,13 +47,14 @@ public class S3ControllerTest {
 				.header("OAUTHToken", OAUTH)
 				.content(body))
 				.andExpect(status().isServiceUnavailable())
-				.andExpect(content().string(containsString("Error calling S3. Try again later")));
+				.andExpect(content().string(containsString("Error calling S3. Try again later")))
+				.andExpect(content().string(containsString(ERROR_MESSAGE)));
 	}
 	
 	@Test
 	public void testS3PutObjectError() throws Exception {
 		when(s3Client.saveData(Mockito.any(byte[].class), Mockito.anyString()))
-		.thenThrow(new AWSS3ClientException("test"));
+		.thenThrow(new AWSS3ClientException(ERROR_MESSAGE));
 		SpotifyUser user = spotifyUtil.createTestUser();
 		String body = mapper.writeValueAsString(user);
 		this.mockMvc.perform(MockMvcRequestBuilders
@@ -62,9 +64,8 @@ public class S3ControllerTest {
 				.header("OAUTHToken", OAUTH)
 				.content(body))
 				.andExpect(status().isServiceUnavailable())
-				.andExpect(content().string(containsString("Error calling S3. Try again later")));
-		
-		
+				.andExpect(content().string(containsString("Error calling S3. Try again later")))
+				.andExpect(content().string(containsString(ERROR_MESSAGE)));
 	}
 
 }

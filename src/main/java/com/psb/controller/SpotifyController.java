@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
 import com.psb.client.SpotifyClient;
+import com.psb.exception.SpotifyClientException;
+import com.psb.exception.SpotifyClientUnauthorizedException;
 import com.psb.model.repository.Playlist;
 import com.psb.model.repository.Playlists;
 import com.psb.model.spotify.SpotifyPlaylist;
@@ -34,7 +36,8 @@ public class SpotifyController {
 	}
 	
 	@GetMapping(path = "/playlists")
-	public Playlists savePlaylist(@RequestHeader String oauthToken) {
+	public Playlists savePlaylist(@RequestHeader String oauthToken)
+			throws SpotifyClientException, SpotifyClientUnauthorizedException{
 		SpotifyPlaylists playlists = spotifyClient.getPlaylists(oauthToken);
 		Playlists resp = new Playlists();
 		List<Playlist> spotifyPlaylists = new ArrayList<>();

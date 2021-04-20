@@ -14,6 +14,7 @@ import com.psb.exception.SpotifyClientException;
 import com.psb.exception.SpotifyClientUnauthorizedException;
 import com.psb.model.spotify.SpotifyPlaylist;
 import com.psb.model.spotify.SpotifyPlaylists;
+import com.psb.model.spotify.SpotifyTrack;
 import com.psb.model.spotify.SpotifyTracks;
 
 import reactor.core.publisher.Mono;
@@ -83,19 +84,41 @@ public class SpotifyClient {
 		return spotifyPlaylists;
 	}
 	
-	public SpotifyTracks getPlaylistTracks(String oauthToken, SpotifyPlaylist playlist) throws SpotifyClientException{
-		MultiThreadedSpotifyClient threadedClient = new MultiThreadedSpotifyClient(client, oauthToken, playlist);
-		Thread thread = new Thread(threadedClient);
-		thread.start();
-		try {
-			thread.join();
-		} catch (InterruptedException e) {
-			logger.info(e.getMessage());
+	public SpotifyTracks getPlaylistTracks(String oauthToken, SpotifyPlaylist playlist) throws SpotifyClientException {
+		return getPlaylistTracksWithPagination(oauthToken, playlist);
+	}
+	
+	private SpotifyTracks getPlaylistTracksWithPagination(String oauthToken, SpotifyPlaylist playlist) throws SpotifyClientException{
+		System.out.println("***********************************************");
+		System.out.println("Getting " + playlist.getName() + " tracks");
+		System.out.println("***********************************************");
+		String tracksUrl = playlist.getTracksUrl();
+		SpotifyTracks tracks = new SpotifyTracks();
+		List<SpotifyTrack> tracksList = new ArrayList<>();
+		System.out.println(tracksUrl);
+		while (tracksUrl != null) {
+			System.out.println(tracksUrl);
+			SpotifyTracks tempTracks = client.get().uri(tracksUrl)
+					.headers(httpHeaders -> {
+						httpHeaders.setBearerAuth(oauthToken);
+					})
+					.retrieve()
+					.onStatus(HttpStatus::isError, response ->{ 
+		            	if (response.statusCode() == HttpStatus.UNAUTHORIZED) {
+		            		return Mono.error(new SpotifyClientUnauthorizedException(
+		            				UNAUTHORIZED_ERROR_MESSAGE));
+		            	} else {
+			            	return Mono.error(new SpotifyClientException(response.statusCode().toString()));
+		            	}
+		            }).bodyToMono(SpotifyTracks.class).block();
+			tracksList.addAll(tempTracks.getTracks());
+			tracksUrl = tempTracks.getNext();
 		}
-		if (threadedClient.getErrorMessage() != null) {
-			throw new SpotifyClientException(threadedClient.getErrorMessage());
+		tracks.setTracks(tracksList);
+		for (SpotifyTrack spotifyTrack : tracks.getTracks()) {
+			System.out.println(spotifyTrack.getName());
 		}
-		return threadedClient.getTracks();
+		return tracks;
 	}
 
 }

@@ -39,7 +39,16 @@ public class SpotifyClient {
 
 	public SpotifyPlaylists getPlaylists(String oauthToken)
 			throws SpotifyClientException, SpotifyClientUnauthorizedException {
-		return getPlaylistsWithPagination(oauthToken);
+		try {
+			return getPlaylistsWithPagination(oauthToken);
+		} catch (RuntimeException e) {
+			if (e.getCause().getClass() == SpotifyClientUnauthorizedException.class) {
+				throw new SpotifyClientUnauthorizedException(e.getMessage());
+			} else if (e.getCause().getClass() == SpotifyClientException.class) {
+				throw new SpotifyClientException(e.getMessage());
+			}
+		}
+		return null;
 	}
 
 	private SpotifyPlaylists getPlaylistsWithPagination(String oauthToken) {
@@ -70,7 +79,16 @@ public class SpotifyClient {
 
 	public SpotifyTracks getPlaylistTracks(String oauthToken, SpotifyPlaylist playlist)
 			throws SpotifyClientException, SpotifyClientUnauthorizedException {
-		return getPlaylistTracksWithPagination(oauthToken, playlist);
+		try {
+			return getPlaylistTracksWithPagination(oauthToken, playlist);
+		} catch (RuntimeException e) {
+			if (e.getCause().getClass() == SpotifyClientUnauthorizedException.class) {
+				throw new SpotifyClientUnauthorizedException(e.getMessage());
+			} else if (e.getCause().getClass() == SpotifyClientException.class) {
+				throw new SpotifyClientException(e.getMessage());
+			}
+		}
+		return null;
 	}
 
 	private SpotifyTracks getPlaylistTracksWithPagination(String oauthToken, SpotifyPlaylist playlist) {

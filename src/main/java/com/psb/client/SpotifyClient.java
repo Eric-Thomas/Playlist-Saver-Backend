@@ -41,8 +41,7 @@ public class SpotifyClient {
 		return getPlaylistsWithPagination(oauthToken);
 	}
 
-	private SpotifyPlaylists getPlaylistsWithPagination(String oauthToken)
-			throws SpotifyClientException, SpotifyClientUnauthorizedException {
+	private SpotifyPlaylists getPlaylistsWithPagination(String oauthToken) {
 		SpotifyPlaylists spotifyPlaylists = new SpotifyPlaylists();
 		List<SpotifyPlaylist> playlistsList = new ArrayList<>();
 		while (playlistsUrl != null) {

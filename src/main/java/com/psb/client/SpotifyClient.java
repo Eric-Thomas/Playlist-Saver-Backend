@@ -47,17 +47,22 @@ public class SpotifyClient {
 		List<SpotifyPlaylist> playlistsList = new ArrayList<>();
 		while (playlistsUrl != null) {
 			logger.info("Getting playlists at {}", playlistsUrl);
-			SpotifyPlaylists playlists = client.get().uri(playlistsUrl).headers(httpHeaders -> {
-				httpHeaders.setBearerAuth(oauthToken);
-			}).retrieve().onStatus(HttpStatus::isError, response -> {
-				if (response.statusCode() == HttpStatus.UNAUTHORIZED) {
-					return Mono.error(new SpotifyClientUnauthorizedException(UNAUTHORIZED_ERROR_MESSAGE));
-				} else {
-					return Mono.error(new SpotifyClientException(response.statusCode().toString()));
-				}
-			}).bodyToMono(SpotifyPlaylists.class).block();
-			playlistsList.addAll(playlists.getPlaylists());
-			playlistsUrl = playlists.getNext();
+			SpotifyPlaylists playlists = client.get().uri(playlistsUrl)
+					.headers(httpHeaders -> httpHeaders.setBearerAuth(oauthToken)).retrieve()
+					.onStatus(HttpStatus::isError, response -> {
+						if (response.statusCode() == HttpStatus.UNAUTHORIZED) {
+							return Mono.error(new SpotifyClientUnauthorizedException(UNAUTHORIZED_ERROR_MESSAGE));
+						} else {
+							return Mono.error(new SpotifyClientException(response.statusCode().toString()));
+						}
+					}).bodyToMono(SpotifyPlaylists.class).block();
+			if (playlists != null) {
+				playlistsList.addAll(playlists.getPlaylists());
+				playlistsUrl = playlists.getNext();
+			} else {
+				playlistsUrl = null;
+			}
+
 		}
 		spotifyPlaylists.setPlaylists(playlistsList);
 		return spotifyPlaylists;

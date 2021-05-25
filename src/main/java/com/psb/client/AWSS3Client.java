@@ -47,7 +47,7 @@ public class AWSS3Client {
 					software.amazon.awssdk.core.sync.RequestBody.fromBytes(data));
 			response.setResult(s3Response.eTag()); // eTag is AWS's object hash, i.e. ideally unique ID
 			response.setSuccess(true);
-			response.setKilobytes((int) data.length / 1024);
+			response.setKilobytes(data.length / 1024);
 			logger.info("Data size: " + response.getKilobytes() + "kB");
 			logger.info("Tag information: " + response.getResult());
 			return response;

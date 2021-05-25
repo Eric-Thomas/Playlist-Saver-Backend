@@ -23,7 +23,7 @@ import com.psb.testUtil.SpotifyUtil;
 
 import okhttp3.mockwebserver.MockWebServer;
 
-public class SpotifyClientTest {
+class SpotifyClientTest {
 
 	private static MockWebServer mockSpotifyServer;
 	private SpotifyClient spotifyClient;

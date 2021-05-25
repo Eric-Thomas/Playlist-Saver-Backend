@@ -46,7 +46,7 @@ public class SpotifyClient {
 		SpotifyPlaylists spotifyPlaylists = new SpotifyPlaylists();
 		List<SpotifyPlaylist> playlistsList = new ArrayList<>();
 		while (playlistsUrl != null) {
-			logger.info("Getting playlists at " + playlistsUrl);
+			logger.info("Getting playlists at {}", playlistsUrl);
 			SpotifyPlaylists playlists = client.get().uri(playlistsUrl).headers(httpHeaders -> {
 				httpHeaders.setBearerAuth(oauthToken);
 			}).retrieve().onStatus(HttpStatus::isError, response -> {

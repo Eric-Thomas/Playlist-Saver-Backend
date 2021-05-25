@@ -10,7 +10,7 @@ import lombok.Data;
 
 @Data
 public class SpotifyTracks {
-	
+
 	@JsonProperty("items")
 	@JsonInclude(Include.NON_NULL)
 	private List<SpotifyTrack> tracks;

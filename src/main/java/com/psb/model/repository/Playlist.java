@@ -7,7 +7,7 @@ import lombok.Data;
 
 @Data
 public class Playlist implements Serializable {
-	
+
 	/**
 	 * Generated serial version ID
 	 */

@@ -24,34 +24,31 @@ import com.psb.util.SpotifyResponseConverter;
 @RequestMapping("/spotify")
 @SessionAttributes("oauth")
 public class SpotifyController {
-	
+
 	private SpotifyClient spotifyClient;
 	private SpotifyResponseConverter spotifyResponseConverter;
-	
+
 	@Autowired
-	public SpotifyController(SpotifyClient spotifyClient,
-			SpotifyResponseConverter spotifyResponseConverter) {
+	public SpotifyController(SpotifyClient spotifyClient, SpotifyResponseConverter spotifyResponseConverter) {
 		this.spotifyClient = spotifyClient;
 		this.spotifyResponseConverter = spotifyResponseConverter;
 	}
-	
+
 	@GetMapping(path = "/playlists")
 	public Playlists savePlaylist(@RequestHeader String oauthToken)
-			throws SpotifyClientException, SpotifyClientUnauthorizedException{
+			throws SpotifyClientException, SpotifyClientUnauthorizedException {
 		SpotifyPlaylists playlists = spotifyClient.getPlaylists(oauthToken);
 		Playlists resp = new Playlists();
 		List<Playlist> spotifyPlaylists = new ArrayList<>();
 		for (SpotifyPlaylist playlist : playlists.getPlaylists()) {
-			SpotifyTracks tracks = spotifyClient.getPlaylistTracks(
-					oauthToken, playlist);
-			Playlist repositoryPlaylist = 
-					spotifyResponseConverter.convertPlaylist(playlist, tracks);
+			SpotifyTracks tracks = spotifyClient.getPlaylistTracks(oauthToken, playlist);
+			Playlist repositoryPlaylist = spotifyResponseConverter.convertPlaylist(playlist, tracks);
 			spotifyPlaylists.add(repositoryPlaylist);
 		}
 		resp.setPlaylists(spotifyPlaylists);
 		return resp;
 	}
-	
+
 	@GetMapping(path = "/login")
 	public String login() {
 		return spotifyClient.login();

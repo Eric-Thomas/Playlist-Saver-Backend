@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Data
 public class Playlists {
-	
+
 	private List<Playlist> playlists;
 
 }

@@ -8,7 +8,7 @@ import lombok.Data;
 
 @Data
 public class SpotifyUser {
-	
+
 	private String username;
 	private String oauthToken;
 	private List<Playlist> playlists;

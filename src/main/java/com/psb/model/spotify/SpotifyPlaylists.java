@@ -8,9 +8,9 @@ import lombok.Data;
 
 @Data
 public class SpotifyPlaylists {
-	
+
 	private String next;
 	@JsonProperty("items")
 	private List<SpotifyPlaylist> playlists;
-	
+
 }

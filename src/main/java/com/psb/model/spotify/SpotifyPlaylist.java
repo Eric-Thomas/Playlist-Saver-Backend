@@ -8,12 +8,13 @@ import lombok.Data;
 
 @Data
 public class SpotifyPlaylist {
-	
+
 	private String name;
 	private String tracksUrl;
+
 	@JsonProperty("tracks")
 	private void unpackNested(Map<String, Object> tracks) {
-		this.tracksUrl = (String)tracks.get("href");
+		this.tracksUrl = (String) tracks.get("href");
 	}
-	
+
 }

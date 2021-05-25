@@ -11,6 +11,6 @@ public class Artist implements Serializable {
 	 * Generated serial version ID
 	 */
 	private static final long serialVersionUID = 9000290933672871662L;
-	
+
 	private String name;
 }

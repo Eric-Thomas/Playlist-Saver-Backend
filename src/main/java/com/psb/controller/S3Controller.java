@@ -24,30 +24,30 @@ import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 @RestController
 @RequestMapping("/s3")
 public class S3Controller {
-	
+
 	private AWSS3Client s3Client;
-	
+
 	public S3Controller(AWSS3Client s3Client) {
 		this.s3Client = s3Client;
 	}
-	
-	@PutMapping(path = "/save", consumes = {MediaType.APPLICATION_JSON_VALUE})
+
+	@PutMapping(path = "/save", consumes = { MediaType.APPLICATION_JSON_VALUE })
 	public S3Response save(@RequestBody SpotifyUser spotifyUser) throws AWSS3ClientException {
 		// Spotify usernames are unique, so we'll use those to identify bucket objects
-	    String objectKey = spotifyUser.getUsername();
-	    byte[] data = Compresser.compress(SerializationUtils.serialize(spotifyUser.getPlaylists()));
-	    return s3Client.saveData(data, objectKey);
+		String objectKey = spotifyUser.getUsername();
+		byte[] data = Compresser.compress(SerializationUtils.serialize(spotifyUser.getPlaylists()));
+		return s3Client.saveData(data, objectKey);
 	}
-	
+
 	@SuppressWarnings("unchecked")
-	@GetMapping(path = "/load", consumes = {MediaType.APPLICATION_JSON_VALUE})
+	@GetMapping(path = "/load", consumes = { MediaType.APPLICATION_JSON_VALUE })
 	public Playlists load(@RequestBody SpotifyUser spotifyUser) throws AWSS3ClientException {
 		Playlists playlists = new Playlists();
 		// Spotify usernames are unique, so we'll use those to identify bucket objects
-	    String objectKey = spotifyUser.getUsername();
-        ResponseBytes<GetObjectResponse> objectBytes = s3Client.getData(objectKey);
-        Object object = SerializationUtils.deserialize(Compresser.decompress(objectBytes.asByteArray()));
-        playlists.setPlaylists((List<Playlist>) object);
+		String objectKey = spotifyUser.getUsername();
+		ResponseBytes<GetObjectResponse> objectBytes = s3Client.getData(objectKey);
+		Object object = SerializationUtils.deserialize(Compresser.decompress(objectBytes.asByteArray()));
+		playlists.setPlaylists((List<Playlist>) object);
 		return playlists;
 	}
 

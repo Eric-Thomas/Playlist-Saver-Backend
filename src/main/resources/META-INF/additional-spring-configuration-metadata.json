@@ -15,7 +15,7 @@
     "description": "Redirect uri for our spotify application"
   },
   {
-    "name": "spotify.playlists.url",
+    "name": "spotify.playlists.uri",
     "type": "java.lang.String",
     "description": "Uri for getting spotify playlists"
   },

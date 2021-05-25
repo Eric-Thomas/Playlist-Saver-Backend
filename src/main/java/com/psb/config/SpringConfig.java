@@ -38,7 +38,6 @@ public class SpringConfig {
 				.type(ProfileFile.Type.CREDENTIALS).build();
 		ProfileCredentialsProvider provider = ProfileCredentialsProvider.builder().profileFile(profileFile).build();
 		Region region = Region.US_EAST_1;
-		S3Client s3 = S3Client.builder().credentialsProvider(provider).region(region).build();
-		return s3;
+		return S3Client.builder().credentialsProvider(provider).region(region).build();
 	}
 }

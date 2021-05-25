@@ -18,10 +18,6 @@ import com.psb.model.spotify.SpotifyTracks;
 @Component
 public class SpotifyResponseConverter {
 
-	public SpotifyResponseConverter() {
-
-	}
-
 	public Playlist convertPlaylist(SpotifyPlaylist spotifyPlaylist, SpotifyTracks spotifyTracks) {
 		Playlist repositoryPlaylist = new Playlist();
 		repositoryPlaylist.setPlaylistName(spotifyPlaylist.getName());

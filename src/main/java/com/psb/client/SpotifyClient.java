@@ -68,12 +68,12 @@ public class SpotifyClient {
 		return spotifyPlaylists;
 	}
 
-	public SpotifyTracks getPlaylistTracks(String oauthToken, SpotifyPlaylist playlist) throws SpotifyClientException {
+	public SpotifyTracks getPlaylistTracks(String oauthToken, SpotifyPlaylist playlist)
+			throws SpotifyClientException, SpotifyClientUnauthorizedException {
 		return getPlaylistTracksWithPagination(oauthToken, playlist);
 	}
 
-	private SpotifyTracks getPlaylistTracksWithPagination(String oauthToken, SpotifyPlaylist playlist)
-			throws SpotifyClientException {
+	private SpotifyTracks getPlaylistTracksWithPagination(String oauthToken, SpotifyPlaylist playlist) {
 		logger.info("***********************************************");
 		logger.info("Getting {} tracks", playlist.getName());
 		logger.info("***********************************************");

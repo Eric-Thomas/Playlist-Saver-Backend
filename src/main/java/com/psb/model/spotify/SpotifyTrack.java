@@ -28,12 +28,10 @@ public class SpotifyTrack {
 			this.uri = (String) track.get("uri");
 			try {
 				String albumJson = mapper.writeValueAsString(track.get("album"));
-				SpotifyAlbum album = mapper.readValue(albumJson, SpotifyAlbum.class);
-				this.album = album;
+				this.album = mapper.readValue(albumJson, SpotifyAlbum.class);
 				String artistsJson = mapper.writeValueAsString(track.get("artists"));
-				List<SpotifyArtist> artists = mapper.readValue(artistsJson, new TypeReference<List<SpotifyArtist>>() {
+				this.artists = mapper.readValue(artistsJson, new TypeReference<List<SpotifyArtist>>() {
 				});
-				this.artists = artists;
 			} catch (JsonProcessingException e) {
 				e.printStackTrace();
 			}

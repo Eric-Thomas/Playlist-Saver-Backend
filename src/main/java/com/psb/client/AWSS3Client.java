@@ -1,9 +1,9 @@
 package com.psb.client;
 
-import java.util.logging.Logger;
-
 import javax.annotation.PreDestroy;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -24,7 +24,7 @@ public class AWSS3Client {
 	@Value("${aws.bucket.name}")
 	private String bucketName;
 	private S3Client s3;
-	private Logger logger = Logger.getLogger(AWSS3Client.class.getName());
+	private Logger logger = LoggerFactory.getLogger(AWSS3Client.class);
 
 	@Autowired
 	public AWSS3Client(S3Client s3) {
@@ -48,8 +48,8 @@ public class AWSS3Client {
 			response.setResult(s3Response.eTag()); // eTag is AWS's object hash, i.e. ideally unique ID
 			response.setSuccess(true);
 			response.setKilobytes(data.length / 1024);
-			logger.info("Data size: " + response.getKilobytes() + "kB");
-			logger.info("Tag information: " + response.getResult());
+			logger.info("Data size: {} kB", response.getKilobytes());
+			logger.info("Tag information: {}", response.getResult());
 			return response;
 		} catch (Exception e) {
 			throw new AWSS3ClientException("Error putting object to s3\n" + e.getMessage());

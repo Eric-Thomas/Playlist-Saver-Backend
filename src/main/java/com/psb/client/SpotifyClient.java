@@ -2,8 +2,9 @@ package com.psb.client;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -27,7 +28,7 @@ public class SpotifyClient {
 
 	private WebClient client;
 
-	private Logger logger = Logger.getLogger(SpotifyClient.class.getName());
+	private Logger logger = LoggerFactory.getLogger(SpotifyClient.class);
 
 	private static final String UNAUTHORIZED_ERROR_MESSAGE = "Invalid spotify oauth token.";
 
@@ -68,15 +69,13 @@ public class SpotifyClient {
 
 	private SpotifyTracks getPlaylistTracksWithPagination(String oauthToken, SpotifyPlaylist playlist)
 			throws SpotifyClientException {
-		System.out.println("***********************************************");
-		System.out.println("Getting " + playlist.getName() + " tracks");
-		System.out.println("***********************************************");
+		logger.info("***********************************************");
+		logger.info("Getting {} tracks", playlist.getName());
+		logger.info("***********************************************");
 		String tracksUrl = playlist.getTracksUrl();
 		SpotifyTracks tracks = new SpotifyTracks();
 		List<SpotifyTrack> tracksList = new ArrayList<>();
-		System.out.println(tracksUrl);
 		while (tracksUrl != null) {
-			System.out.println(tracksUrl);
 			SpotifyTracks tempTracks = client.get().uri(tracksUrl).headers(httpHeaders -> {
 				httpHeaders.setBearerAuth(oauthToken);
 			}).retrieve().onStatus(HttpStatus::isError, response -> {
@@ -91,7 +90,7 @@ public class SpotifyClient {
 		}
 		tracks.setTracks(tracksList);
 		for (SpotifyTrack spotifyTrack : tracks.getTracks()) {
-			System.out.println(spotifyTrack.getName());
+			logger.info("Track: {}", spotifyTrack.getName());
 		}
 		return tracks;
 	}

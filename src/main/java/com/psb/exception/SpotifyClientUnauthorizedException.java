@@ -4,7 +4,7 @@ public class SpotifyClientUnauthorizedException extends Exception {
 
 	private static final long serialVersionUID = 5661341433067159365L;
 	
-	private String errorMessage;
+	private final String errorMessage;
 
 	public SpotifyClientUnauthorizedException(String errorMessage) {
 		super(errorMessage);

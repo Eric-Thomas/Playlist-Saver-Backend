@@ -4,7 +4,7 @@ public class SpotifyClientException extends Exception {
 
 	private static final long serialVersionUID = -179894121030362966L;
 
-	private String errorMessage;
+	private final String errorMessage;
 
 	public SpotifyClientException(String errorMessage) {
 		super(errorMessage);

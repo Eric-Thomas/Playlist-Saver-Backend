@@ -10,6 +10,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.psb.exception.SpotifyClientException;
@@ -23,31 +24,33 @@ import com.psb.testUtil.SpotifyUtil;
 import okhttp3.mockwebserver.MockWebServer;
 
 public class SpotifyClientTest {
-	
+
 	private static MockWebServer mockSpotifyServer;
 	private SpotifyClient spotifyClient;
 	private SpotifyUtil spotifyUtil = new SpotifyUtil();
 
-    @BeforeAll
-    public static void setUp() throws IOException {
-        mockSpotifyServer = new MockWebServer();
-        mockSpotifyServer.start();
-    }
- 
-    @AfterAll
-    public static void tearDown() throws IOException {
-        mockSpotifyServer.shutdown();
-    }
-    
-    @BeforeEach
-    void initialize() {
-        String baseUrl = String.format("http://localhost:%s", 
-          mockSpotifyServer.getPort());
-        WebClient client = WebClient.create(baseUrl);
-        spotifyClient = new SpotifyClient(client);
-        spotifyUtil.setMockServerUrl(baseUrl);
-    }
-	
+	@BeforeAll
+	public static void setUp() throws IOException {
+		mockSpotifyServer = new MockWebServer();
+		mockSpotifyServer.start();
+	}
+
+	@AfterAll
+	public static void tearDown() throws IOException {
+		mockSpotifyServer.shutdown();
+	}
+
+	@BeforeEach
+	void initialize() {
+		String baseUrl = String.format("http://localhost:%s", mockSpotifyServer.getPort());
+		WebClient client = WebClient.create(baseUrl);
+		spotifyClient = new SpotifyClient(client);
+		spotifyUtil.setMockServerUrl(baseUrl);
+		// Sets playlists url since it is a value drawn from properties file in the
+		// class under test
+		ReflectionTestUtils.setField(spotifyClient, "playlistsUrl", "/");
+	}
+
 	@Test
 	void testGetPlaylistsNoPagination() throws SpotifyClientException, SpotifyClientUnauthorizedException {
 		SpotifyPlaylists testPlaylists = spotifyUtil.createTestPlaylists();
@@ -55,7 +58,7 @@ public class SpotifyClientTest {
 		SpotifyPlaylists clientPlaylists = spotifyClient.getPlaylists("oauthToken");
 		assertEquals(testPlaylists, clientPlaylists);
 	}
-	
+
 	@Test
 	void testGetPlaylistsWithPagination() throws SpotifyClientException, SpotifyClientUnauthorizedException {
 		List<SpotifyPlaylists> testPlaylistsList = spotifyUtil.createTestPlaylistsWithPagination();
@@ -65,7 +68,7 @@ public class SpotifyClientTest {
 		assertEquals(testPlaylists, clientPlaylists);
 		assertEquals(testPlaylists.getPlaylists().size(), clientPlaylists.getPlaylists().size());
 	}
-	
+
 	private SpotifyPlaylists combinePlaylistsList(List<SpotifyPlaylists> list) {
 		SpotifyPlaylists spotifyPlaylists = new SpotifyPlaylists();
 		List<SpotifyPlaylist> playlistList = new ArrayList<>();
@@ -75,7 +78,7 @@ public class SpotifyClientTest {
 		spotifyPlaylists.setPlaylists(playlistList);
 		return spotifyPlaylists;
 	}
-	
+
 	@Test
 	void testGetPlaylistTracksNoPagination() throws SpotifyClientException {
 		SpotifyPlaylist testPlaylist = spotifyUtil.createTestPlaylist();
@@ -84,7 +87,7 @@ public class SpotifyClientTest {
 		SpotifyTracks clientTracks = spotifyClient.getPlaylistTracks("oauthToken", testPlaylist);
 		assertEquals(testTracks, clientTracks);
 	}
-	
+
 	@Test
 	void testGetPlaylistsTracksWithPagination() throws SpotifyClientException {
 		SpotifyPlaylist testPlaylist = spotifyUtil.createTestPlaylist();
@@ -93,9 +96,9 @@ public class SpotifyClientTest {
 		spotifyUtil.addMockTracksPaginationResponses(testTracksList, mockSpotifyServer);
 		SpotifyTracks clientTracks = spotifyClient.getPlaylistTracks("oauthToken", testPlaylist);
 		assertEquals(testTracks, clientTracks);
-		assertEquals(testTracks.getTracks().size(), clientTracks.getTracks().size());	
+		assertEquals(testTracks.getTracks().size(), clientTracks.getTracks().size());
 	}
-	
+
 	private SpotifyTracks combineTracksList(List<SpotifyTracks> list) {
 		SpotifyTracks spotifyTracks = new SpotifyTracks();
 		List<SpotifyTrack> tracksList = new ArrayList<>();
@@ -105,6 +108,5 @@ public class SpotifyClientTest {
 		spotifyTracks.setTracks(tracksList);
 		return spotifyTracks;
 	}
-	
 
 }

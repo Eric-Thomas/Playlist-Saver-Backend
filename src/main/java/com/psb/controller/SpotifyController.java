@@ -48,9 +48,4 @@ public class SpotifyController {
 		resp.setPlaylists(spotifyPlaylists);
 		return resp;
 	}
-
-	@GetMapping(path = "/login")
-	public String login() {
-		return spotifyClient.login();
-	}
 }

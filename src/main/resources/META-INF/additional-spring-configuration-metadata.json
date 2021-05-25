@@ -8,5 +8,25 @@
     "name": "aws.bucket.name",
     "type": "java.lang.String",
     "description": "Bucket to save playlists to"
+  },
+  {
+    "name": "spotify.redirect.uri",
+    "type": "java.lang.String",
+    "description": "Redirect uri for our spotify application"
+  },
+  {
+    "name": "spotify.playlists.url",
+    "type": "java.lang.String",
+    "description": "Uri for getting spotify playlists"
+  },
+  {
+    "name": "spotify.scope",
+    "type": "java.lang.String",
+    "description": "Spotify scopes for our oauth token"
+  },
+  {
+    "name": "spotify.client.id",
+    "type": "java.lang.String",
+    "description": "Our Spotify client id"
   }
 ]}

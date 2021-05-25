@@ -22,30 +22,18 @@ import reactor.core.publisher.Mono;
 @Component
 public class SpotifyClient {
 
-	private WebClient client;
+	@Value("${spotify.playlists.uri}")
+	private String playlistsUrl;
 
-	@Value("${spotify.client.id}")
-	private String clientId;
-	@Value("${spotify.redirect.uri}")
-	private String redirectUri;
-	@Value("${spotify.scope}")
-	private String scope;
+	private WebClient client;
 
 	private Logger logger = Logger.getLogger(SpotifyClient.class.getName());
 
-	private static final String GET_PLAYLISTS_PATH = "/me/playlists?limit=50";
 	private static final String UNAUTHORIZED_ERROR_MESSAGE = "Invalid spotify oauth token.";
 
 	@Autowired
 	public SpotifyClient(WebClient webClient) {
 		this.client = webClient;
-	}
-
-	public String login() {
-
-		return client.get().uri("https://accounts.spotify.com/authorize").attribute("response_type", "code")
-				.attribute("client_id", clientId).attribute("scope", scope).attribute("redirect_uri", redirectUri)
-				.retrieve().bodyToMono(String.class).block();
 	}
 
 	public SpotifyPlaylists getPlaylists(String oauthToken)
@@ -56,7 +44,6 @@ public class SpotifyClient {
 	private SpotifyPlaylists getPlaylistsWithPagination(String oauthToken)
 			throws SpotifyClientException, SpotifyClientUnauthorizedException {
 		SpotifyPlaylists spotifyPlaylists = new SpotifyPlaylists();
-		String playlistsUrl = GET_PLAYLISTS_PATH;
 		List<SpotifyPlaylist> playlistsList = new ArrayList<>();
 		while (playlistsUrl != null) {
 			logger.info("Getting playlists at " + playlistsUrl);

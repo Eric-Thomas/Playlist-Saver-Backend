@@ -20,49 +20,42 @@ import com.psb.exception.AWSS3ClientException;
 import com.psb.model.spotify.SpotifyUser;
 import com.psb.testUtil.SpotifyUtil;
 
-@WebMvcTest(controllers = {S3Controller.class})
-public class S3ControllerTest {
-	
+@WebMvcTest(controllers = { S3Controller.class })
+class S3ControllerTest {
+
 	@Autowired
 	private MockMvc mockMvc;
-	
+
 	@MockBean
 	private AWSS3Client s3Client;
 	private ObjectMapper mapper = new ObjectMapper();
 	private SpotifyUtil spotifyUtil = new SpotifyUtil();
-	
+
 	private static final String OAUTH = "oauthToken";
 	private static final String ERROR_MESSAGE = "Test error message";
-	
+
 	@Test
-	public void testS3GetObjectError() throws Exception {
-		when(s3Client.getData(Mockito.anyString()))
-		.thenThrow(new AWSS3ClientException(ERROR_MESSAGE));
+	void testS3GetObjectError() throws Exception {
+		when(s3Client.getData(Mockito.anyString())).thenThrow(new AWSS3ClientException(ERROR_MESSAGE));
 		SpotifyUser user = spotifyUtil.createTestUser();
 		String body = mapper.writeValueAsString(user);
-		this.mockMvc.perform(MockMvcRequestBuilders
-				.get("/s3/load")
-				.accept(MediaType.APPLICATION_JSON)
-				.contentType(MediaType.APPLICATION_JSON)
-				.header("OAUTHToken", OAUTH)
-				.content(body))
+		this.mockMvc
+				.perform(MockMvcRequestBuilders.get("/s3/load").accept(MediaType.APPLICATION_JSON)
+						.contentType(MediaType.APPLICATION_JSON).header("OAUTHToken", OAUTH).content(body))
 				.andExpect(status().isServiceUnavailable())
 				.andExpect(content().string(containsString("Error calling S3. Try again later")))
 				.andExpect(content().string(containsString(ERROR_MESSAGE)));
 	}
-	
+
 	@Test
-	public void testS3PutObjectError() throws Exception {
+	void testS3PutObjectError() throws Exception {
 		when(s3Client.saveData(Mockito.any(byte[].class), Mockito.anyString()))
-		.thenThrow(new AWSS3ClientException(ERROR_MESSAGE));
+				.thenThrow(new AWSS3ClientException(ERROR_MESSAGE));
 		SpotifyUser user = spotifyUtil.createTestUser();
 		String body = mapper.writeValueAsString(user);
-		this.mockMvc.perform(MockMvcRequestBuilders
-				.put("/s3/save")
-				.accept(MediaType.APPLICATION_JSON)
-				.contentType(MediaType.APPLICATION_JSON)
-				.header("OAUTHToken", OAUTH)
-				.content(body))
+		this.mockMvc
+				.perform(MockMvcRequestBuilders.put("/s3/save").accept(MediaType.APPLICATION_JSON)
+						.contentType(MediaType.APPLICATION_JSON).header("OAUTHToken", OAUTH).content(body))
 				.andExpect(status().isServiceUnavailable())
 				.andExpect(content().string(containsString("Error calling S3. Try again later")))
 				.andExpect(content().string(containsString(ERROR_MESSAGE)));

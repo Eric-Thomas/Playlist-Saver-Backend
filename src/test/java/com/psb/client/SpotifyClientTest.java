@@ -80,7 +80,7 @@ public class SpotifyClientTest {
 	}
 
 	@Test
-	void testGetPlaylistTracksNoPagination() throws SpotifyClientException {
+	void testGetPlaylistTracksNoPagination() throws SpotifyClientException, SpotifyClientUnauthorizedException {
 		SpotifyPlaylist testPlaylist = spotifyUtil.createTestPlaylist();
 		SpotifyTracks testTracks = spotifyUtil.createTestTracks();
 		spotifyUtil.addMockTracksResponse(testTracks, mockSpotifyServer);
@@ -89,7 +89,7 @@ public class SpotifyClientTest {
 	}
 
 	@Test
-	void testGetPlaylistsTracksWithPagination() throws SpotifyClientException {
+	void testGetPlaylistsTracksWithPagination() throws SpotifyClientException, SpotifyClientUnauthorizedException {
 		SpotifyPlaylist testPlaylist = spotifyUtil.createTestPlaylist();
 		List<SpotifyTracks> testTracksList = spotifyUtil.createTestTracksWithPagination();
 		SpotifyTracks testTracks = combineTracksList(testTracksList);

@@ -27,107 +27,86 @@ import com.psb.testUtil.RepositoryUtil;
 import com.psb.testUtil.SpotifyUtil;
 import com.psb.util.SpotifyResponseConverter;
 
-@WebMvcTest(controllers = {SpotifyController.class})
-public class SpotifyControllerTest {
-	
+@WebMvcTest(controllers = { SpotifyController.class })
+class SpotifyControllerTest {
+
 	@LocalServerPort
-    private static int port;
-	
+	private static int port;
+
 	@Autowired
 	private MockMvc mockMvc;
-	
+
 	@MockBean
 	private SpotifyResponseConverter spotifyResponseConverter;
 	@MockBean
 	private SpotifyClient spotifyClient;
 	private SpotifyUtil spotifyUtil = new SpotifyUtil();
 	private RepositoryUtil repositoryUtil = new RepositoryUtil();
-	
+
 	private static final String OAUTH = "oauthToken";
 	private static final String ERROR_MESSAGE = "Test error message";
-	
-	 @BeforeEach
-	    public void initialize(){
-	        spotifyUtil.setMockServerUrl(String.format("http://localhost:%s", 
-	                        port));
-	    }
-	
+
+	@BeforeEach
+	public void initialize() {
+		spotifyUtil.setMockServerUrl(String.format("http://localhost:%s", port));
+	}
+
 	@Test
-	public void testDefaultPlaylist() throws Exception {
+	void testDefaultPlaylist() throws Exception {
 		SpotifyPlaylists testPlaylists = spotifyUtil.createTestPlaylists();
 		when(spotifyClient.getPlaylists(Mockito.any(String.class))).thenReturn(testPlaylists);
-		when(spotifyClient.getPlaylistTracks(Mockito.any(String.class), 
-				Mockito.any(SpotifyPlaylist.class))).thenReturn(
-						spotifyUtil.createTestTracks());
-		when(spotifyResponseConverter.convertPlaylist(Mockito.any(SpotifyPlaylist.class), 
-				Mockito.any(SpotifyTracks.class))).thenReturn(
-				repositoryUtil.createTestRepositoryPlaylist());
-		
-		this.mockMvc.perform(MockMvcRequestBuilders
-				.get("/spotify/playlists")
-				.contentType(MediaType.APPLICATION_JSON)
-				.header("OAUTHToken", OAUTH))
-				.andExpect(status().isOk())
-				.andExpect(content().string(containsString(Constants.TEST_PLAYLIST_NAME)))
+		when(spotifyClient.getPlaylistTracks(Mockito.any(String.class), Mockito.any(SpotifyPlaylist.class)))
+				.thenReturn(spotifyUtil.createTestTracks());
+		when(spotifyResponseConverter.convertPlaylist(Mockito.any(SpotifyPlaylist.class),
+				Mockito.any(SpotifyTracks.class))).thenReturn(repositoryUtil.createTestRepositoryPlaylist());
+
+		this.mockMvc
+				.perform(MockMvcRequestBuilders.get("/spotify/playlists").contentType(MediaType.APPLICATION_JSON)
+						.header("OAUTHToken", OAUTH))
+				.andExpect(status().isOk()).andExpect(content().string(containsString(Constants.TEST_PLAYLIST_NAME)))
 				.andExpect(content().string(containsString(Constants.TEST_ARTIST_NAME)))
-				.andExpect(content().string(containsString(Constants.TEST_SONG_NAME)));		
+				.andExpect(content().string(containsString(Constants.TEST_SONG_NAME)));
 	}
-	
+
 	@Test
-	public void testInvalidOauthToken() throws Exception{
+	void testInvalidOauthToken() throws Exception {
 		when(spotifyClient.getPlaylists(Mockito.any(String.class)))
-		.thenThrow(new SpotifyClientUnauthorizedException(ERROR_MESSAGE));
-		this.mockMvc.perform(MockMvcRequestBuilders
-				.get("/spotify/playlists")
-				.contentType(MediaType.APPLICATION_JSON)
-				.header("OAUTHToken", OAUTH))
-				.andExpect(status().isUnauthorized())
-				.andExpect(content().string(containsString(ERROR_MESSAGE)));		
+				.thenThrow(new SpotifyClientUnauthorizedException(ERROR_MESSAGE));
+		this.mockMvc
+				.perform(MockMvcRequestBuilders.get("/spotify/playlists").contentType(MediaType.APPLICATION_JSON)
+						.header("OAUTHToken", OAUTH))
+				.andExpect(status().isUnauthorized()).andExpect(content().string(containsString(ERROR_MESSAGE)));
 	}
-	
+
 	@Test
-	public void testNoContentTypeHeader() throws Exception {
-		this.mockMvc.perform(MockMvcRequestBuilders
-				.get("/spotify/playlists"))
-				.andExpect(status().isBadRequest());		
+	void testNoContentTypeHeader() throws Exception {
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/spotify/playlists")).andExpect(status().isBadRequest());
 	}
-	
+
 	@Test
-	public void testInvalidBody() throws Exception {
-		this.mockMvc.perform(MockMvcRequestBuilders
-				.get("/spotify/playlists")
-				.accept(MediaType.APPLICATION_JSON)
-				.contentType(MediaType.APPLICATION_JSON))
-				.andExpect(status().isBadRequest());		
+	void testInvalidBody() throws Exception {
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/spotify/playlists").accept(MediaType.APPLICATION_JSON)
+				.contentType(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest());
 	}
-	
+
 	@Test
-	public void testGetPlaylistsError() throws Exception {
-		when(spotifyClient.getPlaylists(Mockito.anyString()))
-		.thenThrow(new SpotifyClientException(ERROR_MESSAGE));
-		this.mockMvc.perform(MockMvcRequestBuilders
-				.get("/spotify/playlists")
-				.accept(MediaType.APPLICATION_JSON)
-				.header("OAUTHToken", OAUTH)
-				.contentType(MediaType.APPLICATION_JSON))
-				.andExpect(status().isServiceUnavailable())
-				.andExpect(content().string(containsString(ERROR_MESSAGE)));
+	void testGetPlaylistsError() throws Exception {
+		when(spotifyClient.getPlaylists(Mockito.anyString())).thenThrow(new SpotifyClientException(ERROR_MESSAGE));
+		this.mockMvc
+				.perform(MockMvcRequestBuilders.get("/spotify/playlists").accept(MediaType.APPLICATION_JSON)
+						.header("OAUTHToken", OAUTH).contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isServiceUnavailable()).andExpect(content().string(containsString(ERROR_MESSAGE)));
 	}
-	
+
 	@Test
-	public void testGetTracksError() throws Exception {
-		when(spotifyClient.getPlaylists(Mockito.anyString()))
-		.thenReturn(spotifyUtil.createTestPlaylists());
+	void testGetTracksError() throws Exception {
+		when(spotifyClient.getPlaylists(Mockito.anyString())).thenReturn(spotifyUtil.createTestPlaylists());
 		when(spotifyClient.getPlaylistTracks(Mockito.anyString(), Mockito.any(SpotifyPlaylist.class)))
-		.thenThrow(new SpotifyClientException(ERROR_MESSAGE));
-		this.mockMvc.perform(MockMvcRequestBuilders
-				.get("/spotify/playlists")
-				.accept(MediaType.APPLICATION_JSON)
-				.header("OAUTHToken", OAUTH)
-				.contentType(MediaType.APPLICATION_JSON))
-				.andExpect(status().isServiceUnavailable())
-				.andExpect(content().string(containsString(ERROR_MESSAGE)));
+				.thenThrow(new SpotifyClientException(ERROR_MESSAGE));
+		this.mockMvc
+				.perform(MockMvcRequestBuilders.get("/spotify/playlists").accept(MediaType.APPLICATION_JSON)
+						.header("OAUTHToken", OAUTH).contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isServiceUnavailable()).andExpect(content().string(containsString(ERROR_MESSAGE)));
 	}
-	
 
 }

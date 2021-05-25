@@ -10,20 +10,17 @@ import com.psb.model.spotify.SpotifyTracks;
 import com.psb.testUtil.RepositoryUtil;
 import com.psb.testUtil.SpotifyUtil;
 
-public class SpotifyResponseConverterTest {
+class SpotifyResponseConverterTest {
 
 	private SpotifyUtil spotifyUtil = new SpotifyUtil();
 	private RepositoryUtil repositoryUtil = new RepositoryUtil();
-	private SpotifyResponseConverter spotifyResponseConverter =
-			new SpotifyResponseConverter();
-	
+	private SpotifyResponseConverter spotifyResponseConverter = new SpotifyResponseConverter();
+
 	@Test
-	public void testConvertPlaylist() {
+	void testConvertPlaylist() {
 		SpotifyPlaylist spotifyPlaylist = spotifyUtil.createTestPlaylist();
 		SpotifyTracks spotifyTracks = spotifyUtil.createTestTracks();
 		Playlist repositoryPlaylist = repositoryUtil.createTestRepositoryPlaylist();
-		assertEquals(repositoryPlaylist, 
-				spotifyResponseConverter.convertPlaylist(spotifyPlaylist,
-						spotifyTracks));
+		assertEquals(repositoryPlaylist, spotifyResponseConverter.convertPlaylist(spotifyPlaylist, spotifyTracks));
 	}
 }

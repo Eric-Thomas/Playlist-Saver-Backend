@@ -1,5 +1,6 @@
 package com.psb.util;
 
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
@@ -22,5 +23,11 @@ class SpotifyResponseConverterTest {
 		SpotifyTracks spotifyTracks = spotifyUtil.createTestTracks();
 		Playlist repositoryPlaylist = repositoryUtil.createTestRepositoryPlaylist();
 		assertEquals(repositoryPlaylist, spotifyResponseConverter.convertPlaylist(spotifyPlaylist, spotifyTracks));
+	}
+
+	@Test
+	void testConvertPlaylistNullTracks() {
+		SpotifyPlaylist spotifyPlaylist = spotifyUtil.createTestPlaylist();
+		assertTrue(spotifyResponseConverter.convertPlaylist(spotifyPlaylist, null).getTracks().isEmpty());
 	}
 }

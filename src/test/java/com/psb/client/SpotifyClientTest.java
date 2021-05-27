@@ -1,5 +1,7 @@
 package com.psb.client;
 
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.IOException;
@@ -78,6 +80,29 @@ class SpotifyClientTest {
 		spotifyPlaylists.setPlaylists(playlistList);
 		return spotifyPlaylists;
 	}
+	
+	@Test
+	void testGetPlaylistsNull() throws SpotifyClientException, SpotifyClientUnauthorizedException {
+		spotifyUtil.addEmptyBodyResponse(mockSpotifyServer);
+		SpotifyPlaylists clientPlaylists = spotifyClient.getPlaylists("oauthToken");
+		assertTrue(clientPlaylists.getPlaylists().isEmpty());
+	}
+	
+	@Test
+	void testGetPlaylistsUnauthorized() {
+		spotifyUtil.addUnauthorizedResponse(mockSpotifyServer);
+		assertThrows(SpotifyClientUnauthorizedException.class, () -> {
+			spotifyClient.getPlaylists("oauthToken");
+		});
+	}
+	
+	@Test
+	void testGetPlaylists5xxError() {
+		spotifyUtil.add5xxResponse(mockSpotifyServer);
+		assertThrows(SpotifyClientException.class, () -> {
+			spotifyClient.getPlaylists("oauthToken");
+		});
+	}
 
 	@Test
 	void testGetPlaylistTracksNoPagination() throws SpotifyClientException, SpotifyClientUnauthorizedException {
@@ -107,6 +132,32 @@ class SpotifyClientTest {
 		}
 		spotifyTracks.setTracks(tracksList);
 		return spotifyTracks;
+	}
+	
+	@Test
+	void testGetPlaylistTracksNull() throws SpotifyClientException, SpotifyClientUnauthorizedException {
+		spotifyUtil.addEmptyBodyResponse(mockSpotifyServer);
+		SpotifyPlaylist playlist = spotifyUtil.createTestPlaylist();
+		SpotifyTracks clientTracks = spotifyClient.getPlaylistTracks("oauthToken", playlist);
+		assertTrue(clientTracks.getTracks().isEmpty());
+	}
+	
+	@Test
+	void testGetPlaylistTracksUnauthorized() {
+		spotifyUtil.addUnauthorizedResponse(mockSpotifyServer);
+		assertThrows(SpotifyClientUnauthorizedException.class, () -> {
+			SpotifyPlaylist playlist = spotifyUtil.createTestPlaylist();
+			spotifyClient.getPlaylistTracks("oauthToken", playlist);
+		});
+	}
+	
+	@Test
+	void testGetPlaylistTracks5xxError() {
+		spotifyUtil.add5xxResponse(mockSpotifyServer);
+		assertThrows(SpotifyClientException.class, () -> {
+			SpotifyPlaylist playlist = spotifyUtil.createTestPlaylist();
+			spotifyClient.getPlaylistTracks("oauthToken", playlist);
+		});
 	}
 
 }

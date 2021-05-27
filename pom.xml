@@ -21,7 +21,8 @@
 		<sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
 		<sonar.jacoco.reportPath>${project.basedir}/../target/jacoco.exec</sonar.jacoco.reportPath>
 		<sonar.language>java</sonar.language>
-		<sonar.exclusions>**/com/psb/model/spotify/*,**/com/psb/config/*,**/com/psb/*</sonar.exclusions>
+		<sonar.exclusions>**/com/psb/model/spotify/*,**/com/psb/config/*,**/com/psb/*,
+		**/com/psb/util/Compresser.*</sonar.exclusions>
 	</properties>
 
 	<dependencies>

@@ -15,6 +15,11 @@
     "description": "Uri for getting spotify playlists"
   },
   {
+    "name": "spotify.user.profile.uri",
+    "type": "java.lang.String",
+    "description": "Uri for getting information about a user"
+  },
+  {
     "name": "runtime.env",
     "type": "java.land.String",
     "description": "Runtime environment"

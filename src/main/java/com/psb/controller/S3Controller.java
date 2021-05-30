@@ -2,6 +2,7 @@ package com.psb.controller;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.util.SerializationUtils;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,6 +28,7 @@ public class S3Controller {
 
 	private AWSS3Client s3Client;
 
+	@Autowired
 	public S3Controller(AWSS3Client s3Client) {
 		this.s3Client = s3Client;
 	}

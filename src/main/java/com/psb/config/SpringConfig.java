@@ -23,6 +23,9 @@ public class SpringConfig {
 	@Value("${spotify.base.url}")
 	private String spotifyBaseUrl;
 
+	@Value("${runtime.env}")
+	private String environment;
+
 	@Bean
 	public WebClient getWebClientBuilder() {
 		return WebClient.builder()
@@ -34,10 +37,17 @@ public class SpringConfig {
 
 	@Bean
 	public S3Client getS3ClientBuilder() {
-		ProfileFile profileFile = ProfileFile.builder().content(Paths.get("credentials"))
-				.type(ProfileFile.Type.CREDENTIALS).build();
-		ProfileCredentialsProvider provider = ProfileCredentialsProvider.builder().profileFile(profileFile).build();
-		Region region = Region.US_EAST_1;
-		return S3Client.builder().credentialsProvider(provider).region(region).build();
+		System.out.println("Runtime env: " + environment);
+		if (environment.equals("local")) {
+			ProfileFile profileFile = ProfileFile.builder().content(Paths.get("credentials"))
+					.type(ProfileFile.Type.CREDENTIALS).build();
+			ProfileCredentialsProvider provider = ProfileCredentialsProvider.builder().profileFile(profileFile).build();
+			Region region = Region.US_EAST_1;
+			return S3Client.builder().credentialsProvider(provider).region(region).build();
+		} else {
+			System.out.println("NON LOCAL ENV DETECTED");
+			// TODO Build S3 client with IAM role permissions
+			return null;
+		}
 	}
 }

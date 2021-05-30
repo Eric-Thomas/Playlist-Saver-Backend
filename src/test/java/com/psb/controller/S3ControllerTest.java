@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.psb.client.AWSS3Client;
 import com.psb.exception.AWSS3ClientException;
+import com.psb.model.repository.S3Response;
 import com.psb.model.spotify.SpotifyUser;
 import com.psb.testUtil.SpotifyUtil;
 
@@ -33,9 +34,11 @@ class S3ControllerTest {
 
 	private static final String OAUTH = "oauthToken";
 	private static final String ERROR_MESSAGE = "Test error message";
+	private static final int KILOBYTES = 42069;
+	private static final String RESULT = "Unique hash id";
 
 	@Test
-	void testS3GetObjectError() throws Exception {
+	void testLoadError() throws Exception {
 		when(s3Client.getData(Mockito.anyString())).thenThrow(new AWSS3ClientException(ERROR_MESSAGE));
 		SpotifyUser user = spotifyUtil.createTestUser();
 		String body = mapper.writeValueAsString(user);
@@ -48,7 +51,25 @@ class S3ControllerTest {
 	}
 
 	@Test
-	void testS3PutObjectError() throws Exception {
+	void testSaveSuccess() throws Exception {
+		S3Response resp = new S3Response();
+		resp.setKilobytes(KILOBYTES);
+		resp.setResult(RESULT);
+		resp.setSuccess(true);
+		when(s3Client.saveData(Mockito.any(byte[].class), Mockito.anyString())).thenReturn(resp);
+
+		SpotifyUser user = spotifyUtil.createTestUser();
+		String body = mapper.writeValueAsString(user);
+		this.mockMvc
+				.perform(MockMvcRequestBuilders.put("/s3/save").accept(MediaType.APPLICATION_JSON)
+						.contentType(MediaType.APPLICATION_JSON).content(body))
+				.andExpect(status().isOk()).andExpect(content().string(containsString(Integer.toString(KILOBYTES))))
+				.andExpect(content().string(containsString(RESULT)))
+				.andExpect(content().string(containsString("true")));
+	}
+
+	@Test
+	void testSaveError() throws Exception {
 		when(s3Client.saveData(Mockito.any(byte[].class), Mockito.anyString()))
 				.thenThrow(new AWSS3ClientException(ERROR_MESSAGE));
 		SpotifyUser user = spotifyUtil.createTestUser();

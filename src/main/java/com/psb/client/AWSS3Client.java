@@ -9,12 +9,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.psb.exception.AWSS3ClientException;
+import com.psb.exception.AWSS3ClientNotFoundException;
 import com.psb.model.repository.S3Response;
 
 import software.amazon.awssdk.core.ResponseBytes;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
+import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 
@@ -56,13 +58,18 @@ public class AWSS3Client {
 		}
 	}
 
-	public ResponseBytes<GetObjectResponse> getData(String objectKey) throws AWSS3ClientException {
+	public ResponseBytes<GetObjectResponse> getData(String objectKey) throws AWSS3ClientException, AWSS3ClientNotFoundException {
 		try {
 			// LMAO java doesn't have import aliasing so one RequestBody must use the fully
 			// qualified name
 			GetObjectRequest s3Request = GetObjectRequest.builder().bucket(bucketName).key(objectKey).build();
 			return s3.getObjectAsBytes(s3Request);
-		} catch (Exception e) {
+		} catch (NoSuchKeyException e) {
+			throw new AWSS3ClientNotFoundException("Error getting object from s3: Ojbect key: " + objectKey + " does not exist");
+		}
+		
+		catch (Exception e) {
+			System.out.println(e);
 			throw new AWSS3ClientException("Error getting object from s3\n" + e.getMessage());
 		}
 	}

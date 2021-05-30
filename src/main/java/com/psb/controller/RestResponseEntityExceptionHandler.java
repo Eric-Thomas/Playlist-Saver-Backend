@@ -9,6 +9,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import com.psb.exception.AWSS3ClientException;
+import com.psb.exception.AWSS3ClientNotFoundException;
 import com.psb.exception.SpotifyClientException;
 import com.psb.exception.SpotifyClientUnauthorizedException;
 
@@ -26,6 +27,12 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
 	protected ResponseEntity<Object> handleS3Exception(AWSS3ClientException ex, WebRequest request) {
 		String bodyOfResponse = "Error calling S3. Try again later. " + ex.toString();
 		return handleExceptionInternal(ex, bodyOfResponse, new HttpHeaders(), HttpStatus.SERVICE_UNAVAILABLE, request);
+	}
+	
+	@ExceptionHandler(value = { AWSS3ClientNotFoundException.class })
+	protected ResponseEntity<Object> handleS3Exception(AWSS3ClientNotFoundException ex, WebRequest request) {
+		String bodyOfResponse = "Error calling S3 404 Not Found. " + ex.toString();
+		return handleExceptionInternal(ex, bodyOfResponse, new HttpHeaders(), HttpStatus.NOT_FOUND, request);
 	}
 
 	@ExceptionHandler(value = { SpotifyClientException.class })

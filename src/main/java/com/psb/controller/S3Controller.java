@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.psb.client.AWSS3Client;
 import com.psb.exception.AWSS3ClientException;
+import com.psb.exception.AWSS3ClientNotFoundException;
 import com.psb.model.repository.Playlist;
 import com.psb.model.repository.Playlists;
 import com.psb.util.Compresser;
@@ -31,7 +32,7 @@ public class S3Controller {
 
 	@SuppressWarnings("unchecked")
 	@GetMapping(path = "/load")
-	public Playlists load(@RequestParam String id) throws AWSS3ClientException {
+	public Playlists load(@RequestParam String id) throws AWSS3ClientException, AWSS3ClientNotFoundException {
 		Playlists playlists = new Playlists();
 		// Spotify usernames are unique, so we'll use those to identify bucket objects
 		String objectKey = id;

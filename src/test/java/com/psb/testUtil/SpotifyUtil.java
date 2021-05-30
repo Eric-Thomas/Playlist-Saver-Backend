@@ -7,14 +7,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.psb.constants.Constants;
-import com.psb.model.repository.Playlist;
 import com.psb.model.spotify.SpotifyAlbum;
 import com.psb.model.spotify.SpotifyArtist;
 import com.psb.model.spotify.SpotifyPlaylist;
 import com.psb.model.spotify.SpotifyPlaylists;
 import com.psb.model.spotify.SpotifyTrack;
 import com.psb.model.spotify.SpotifyTracks;
-import com.psb.model.spotify.SpotifyUser;
 
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -23,7 +21,6 @@ public class SpotifyUtil {
 
 	private ObjectMapper objectMapper;
 	private String mockServerUrl;
-	private RepositoryUtil repositoryUtil = new RepositoryUtil();
 
 	private final int PAGINATION_COUNT = 5;
 	private final int UNAUTHORIZED = 401;
@@ -111,15 +108,6 @@ public class SpotifyUtil {
 		SpotifyArtist testArtist = new SpotifyArtist();
 		testArtist.setName(Constants.TEST_ARTIST_NAME);
 		return testArtist;
-	}
-
-	public SpotifyUser createTestUser() {
-		SpotifyUser testUser = new SpotifyUser();
-		List<Playlist> playlists = new ArrayList<>();
-		playlists.add(repositoryUtil.createTestRepositoryPlaylist());
-		testUser.setPlaylists(playlists);
-		testUser.setUsername("Duddy");
-		return testUser;
 	}
 
 	public void addMockPlaylistsResponse(SpotifyPlaylists playlists, MockWebServer server) {

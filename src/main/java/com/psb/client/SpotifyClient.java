@@ -17,6 +17,7 @@ import com.psb.model.spotify.SpotifyPlaylist;
 import com.psb.model.spotify.SpotifyPlaylists;
 import com.psb.model.spotify.SpotifyTrack;
 import com.psb.model.spotify.SpotifyTracks;
+import com.psb.model.spotify.SpotifyUser;
 
 import reactor.core.publisher.Mono;
 
@@ -25,6 +26,9 @@ public class SpotifyClient {
 
 	@Value("${spotify.playlists.uri}")
 	private String playlistsUrl;
+
+	@Value("${spotify.user.profile.uri}")
+	private String userInfoUrl;
 
 	private WebClient client;
 
@@ -120,6 +124,37 @@ public class SpotifyClient {
 			logger.info("Track: {}", spotifyTrack.getName());
 		}
 		return tracks;
+	}
+
+	public String getUserName(String oauthToken) throws SpotifyClientUnauthorizedException, SpotifyClientException {
+		try {
+			return tryGetUsername(oauthToken);
+		} catch (RuntimeException e) {
+			if (e.getCause().getClass() == SpotifyClientUnauthorizedException.class) {
+				throw new SpotifyClientUnauthorizedException(e.getMessage());
+			} else if (e.getCause().getClass() == SpotifyClientException.class) {
+				throw new SpotifyClientException(e.getMessage());
+			}
+		}
+
+		return null;
+	}
+
+	private String tryGetUsername(String oauthToken) {
+		logger.info("Getting username...");
+		SpotifyUser user = client.get().uri(userInfoUrl).headers(httpHeaders -> httpHeaders.setBearerAuth(oauthToken))
+				.retrieve().onStatus(HttpStatus::isError, response -> {
+					if (response.statusCode() == HttpStatus.UNAUTHORIZED) {
+						return Mono.error(new SpotifyClientUnauthorizedException(UNAUTHORIZED_ERROR_MESSAGE));
+					} else {
+						return Mono.error(new SpotifyClientException(response.statusCode().toString()));
+					}
+				}).bodyToMono(SpotifyUser.class).block();
+		if (user != null) {
+			return user.getId();
+		}
+
+		return null;
 	}
 
 }

@@ -16,6 +16,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import com.psb.client.AWSS3Client;
 import com.psb.client.SpotifyClient;
 import com.psb.constants.Constants;
 import com.psb.exception.SpotifyClientException;
@@ -40,6 +41,8 @@ class SpotifyControllerTest {
 	private SpotifyResponseConverter spotifyResponseConverter;
 	@MockBean
 	private SpotifyClient spotifyClient;
+	@MockBean
+	private AWSS3Client s3Client;
 	private SpotifyUtil spotifyUtil = new SpotifyUtil();
 	private RepositoryUtil repositoryUtil = new RepositoryUtil();
 

@@ -27,5 +27,5 @@ Also make sure permissions on credentials are set to read so it is able to copy 
 `docker build -t {REPOSITORY-NAME}/playlist-saver .`
 
 * Run docker container
-`docker run -p 8080:8080 {REPOSITORY-NAME}/playlist-saver1`
+`docker run -p 8080:8080 {REPOSITORY-NAME}/playlist-saver`
 

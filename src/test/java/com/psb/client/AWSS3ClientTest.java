@@ -13,6 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.psb.constants.Constants;
 import com.psb.exception.AWSS3ClientException;
+import com.psb.exception.AWSS3ClientNotFoundException;
 import com.psb.model.repository.S3Response;
 
 import software.amazon.awssdk.core.ResponseBytes;
@@ -53,7 +54,7 @@ class AWSS3ClientTest {
 	}
 
 	@Test
-	void testGetData() throws AWSS3ClientException {
+	void testGetData() throws AWSS3ClientException, AWSS3ClientNotFoundException {
 		ResponseBytes<GetObjectResponse> resp = null;
 		when(s3.getObjectAsBytes(Mockito.any(GetObjectRequest.class))).thenReturn(resp);
 		ResponseBytes<GetObjectResponse> excpectedResp = resp;

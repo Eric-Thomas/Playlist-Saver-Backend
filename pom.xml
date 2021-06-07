@@ -22,7 +22,7 @@
 		<sonar.jacoco.reportPath>${project.basedir}/../target/jacoco.exec</sonar.jacoco.reportPath>
 		<sonar.language>java</sonar.language>
 		<sonar.exclusions>**/com/psb/model/spotify/*,**/com/psb/config/*,**/com/psb/*,
-		**/com/psb/util/Compresser.*</sonar.exclusions>
+			**/com/psb/util/Compresser.*</sonar.exclusions>
 	</properties>
 
 	<dependencies>
@@ -81,6 +81,12 @@
 			<groupId>com.squareup.okhttp3</groupId>
 			<artifactId>mockwebserver</artifactId>
 			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>io.findify</groupId>
+			<artifactId>s3mock_2.12</artifactId>
+			<version>0.2.6</version>
 		</dependency>
 	</dependencies>
 

@@ -69,7 +69,7 @@ public class AWSS3Client {
 		}
 		
 		catch (Exception e) {
-			System.out.println(e);
+			logger.error(e.getMessage());
 			throw new AWSS3ClientException("Error getting object from s3\n" + e.getMessage());
 		}
 	}

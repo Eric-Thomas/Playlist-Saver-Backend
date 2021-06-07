@@ -52,8 +52,6 @@ public class SpotifyClient {
 				throw new SpotifyClientUnauthorizedException(e.getMessage());
 			} else if (e.getCause().getClass() == SpotifyClientException.class) {
 				throw new SpotifyClientException(e.getMessage());
-			} else {
-				e.printStackTrace();
 			}
 		}
 		return null;

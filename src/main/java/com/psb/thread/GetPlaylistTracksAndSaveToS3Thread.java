@@ -37,27 +37,32 @@ public class GetPlaylistTracksAndSaveToS3Thread implements Runnable {
 		try {
 		String folderPath = null;
 		for (SpotifyPlaylist playlist : playlists.getPlaylists()) {
-			SpotifyTracks tracks = spotifyClient.getPlaylistTracks(oauthToken, playlist);
-			Playlist repositoryPlaylist = spotifyResponseConverter.convertPlaylist(playlist, tracks);
+			Playlist repositoryPlaylist = getRepositoryPlaylist(playlist);
 			if (folderPath == null) {
 				folderPath = spotifyClient.getUserName(oauthToken);
 			}
 			// Spotify usernames are unique, so we'll use those to identify bucket objects
 			String objectKey = folderPath + "/" + playlist.getName() + "/" + playlist.getId();
-			byte[] data = Compresser.compress(SerializationUtils.serialize(repositoryPlaylist));
-			s3Client.saveData(data, objectKey);
+			saveToS3(objectKey, repositoryPlaylist);
 		}
-		} catch (SpotifyClientException e) {
-			// TODO figure it out
-			e.printStackTrace();
-		} catch (SpotifyClientUnauthorizedException e) {
-			// TODO figure it out
+		} catch (SpotifyClientException | SpotifyClientUnauthorizedException e) {
+			// TODO put error Message in s3
 			e.printStackTrace();
 		} catch (AWSS3ClientException e ) {
 			// TODO figure it out
 			e.printStackTrace();
 		}
 
+	}
+	
+	private Playlist getRepositoryPlaylist(SpotifyPlaylist playlist) throws SpotifyClientException, SpotifyClientUnauthorizedException {
+		SpotifyTracks tracks = spotifyClient.getPlaylistTracks(oauthToken, playlist);
+		return spotifyResponseConverter.convertPlaylist(playlist, tracks);
+	}
+	
+	private void saveToS3(String objectKey, Playlist playlist) throws AWSS3ClientException {
+		byte[] data = Compresser.compress(SerializationUtils.serialize(playlist));
+		s3Client.saveData(data, objectKey);
 	}
 
 }

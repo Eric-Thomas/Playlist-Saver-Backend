@@ -37,18 +37,18 @@ public class SpotifyController {
 	public List<PlaylistInfo> getPlaylistsInfo(@RequestHeader String oauthToken)
 			throws SpotifyClientException, SpotifyClientUnauthorizedException {
 		SpotifyPlaylists playlists = spotifyClient.getPlaylists(oauthToken);
-		List<PlaylistInfo> lpp = new ArrayList<>();
+		List<PlaylistInfo> response = new ArrayList<>();
 		for (SpotifyPlaylist playlist : playlists.getPlaylists()) {
-			PlaylistInfo ppp = new PlaylistInfo();
-			ppp.setName(playlist.getName());
+			PlaylistInfo playlistInfo = new PlaylistInfo();
+			playlistInfo.setName(playlist.getName());
 			if (!playlist.getImages().isEmpty()) {
-				ppp.setImageUri(playlist.getImages().get(0).getUrl());
+				playlistInfo.setImageUri(playlist.getImages().get(0).getUrl());
 			}
-			ppp.setId(playlist.getId());
-			lpp.add(ppp);
+			playlistInfo.setId(playlist.getId());
+			response.add(playlistInfo);
 		}
 		getPlaylistsTracksAndSaveToS3(oauthToken, playlists);
-		return lpp;
+		return response;
 	}
 
 	private void getPlaylistsTracksAndSaveToS3(String oauthToken, SpotifyPlaylists playlists) {

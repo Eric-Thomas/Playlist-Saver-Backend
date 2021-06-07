@@ -1,5 +1,6 @@
 package com.psb.client;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,12 +21,13 @@ import com.psb.model.spotify.SpotifyTracks;
 import com.psb.model.spotify.SpotifyUser;
 
 import reactor.core.publisher.Mono;
+import reactor.util.retry.Retry;
 
 @Component
 public class SpotifyClient {
 
 	@Value("${spotify.playlists.uri}")
-	private String playlistsUrl;
+	private String basePlaylistsUrl;
 
 	@Value("${spotify.user.profile.uri}")
 	private String userInfoUrl;
@@ -50,6 +52,8 @@ public class SpotifyClient {
 				throw new SpotifyClientUnauthorizedException(e.getMessage());
 			} else if (e.getCause().getClass() == SpotifyClientException.class) {
 				throw new SpotifyClientException(e.getMessage());
+			} else {
+				e.printStackTrace();
 			}
 		}
 		return null;
@@ -58,6 +62,7 @@ public class SpotifyClient {
 	private SpotifyPlaylists getPlaylistsWithPagination(String oauthToken) {
 		SpotifyPlaylists spotifyPlaylists = new SpotifyPlaylists();
 		List<SpotifyPlaylist> playlistsList = new ArrayList<>();
+		String playlistsUrl = basePlaylistsUrl;
 		while (playlistsUrl != null) {
 			logger.info("Getting playlists at {}", playlistsUrl);
 			SpotifyPlaylists playlists = client.get().uri(playlistsUrl)
@@ -111,7 +116,7 @@ public class SpotifyClient {
 						} else {
 							return Mono.error(new SpotifyClientException(response.statusCode().toString()));
 						}
-					}).bodyToMono(SpotifyTracks.class).block();
+					}).bodyToMono(SpotifyTracks.class).retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(2))).block();
 			if (tempTracks != null) {
 				tracksList.addAll(tempTracks.getTracks());
 				tracksUrl = tempTracks.getNext();

@@ -21,6 +21,7 @@ import com.psb.model.spotify.SpotifyPlaylist;
 import com.psb.model.spotify.SpotifyPlaylists;
 import com.psb.model.spotify.SpotifyTrack;
 import com.psb.model.spotify.SpotifyTracks;
+import com.psb.model.spotify.SpotifyUser;
 import com.psb.testUtil.SpotifyUtil;
 
 import okhttp3.mockwebserver.MockWebServer;
@@ -163,6 +164,29 @@ class SpotifyClientTest {
 		assertThrows(SpotifyClientException.class, () -> {
 			SpotifyPlaylist playlist = spotifyUtil.createTestPlaylist();
 			spotifyClient.getPlaylistTracks("oauthToken", playlist);
+		});
+	}
+	
+	@Test
+	void testGetUsername() throws SpotifyClientUnauthorizedException, SpotifyClientException {
+		SpotifyUser testUser = spotifyUtil.createTestUser();
+		spotifyUtil.addMockUserResponse(testUser, mockSpotifyServer);
+		assertEquals(testUser.getId(), spotifyClient.getUserName("oauth"));
+	}
+	
+	@Test
+	void testGetUsernameUnauthorized() {
+		spotifyUtil.addUnauthorizedResponse(mockSpotifyServer);
+		assertThrows(SpotifyClientUnauthorizedException.class, () -> {
+			spotifyClient.getUserName("oauthToken");
+		});
+	}
+	
+	@Test
+	void testGetUsername5xxError() {
+		spotifyUtil.add5xxResponse(mockSpotifyServer);
+		assertThrows(SpotifyClientException.class, () -> {
+			spotifyClient.getUserName("oauthToken");
 		});
 	}
 

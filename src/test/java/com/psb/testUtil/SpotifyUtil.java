@@ -14,6 +14,7 @@ import com.psb.model.spotify.SpotifyPlaylist;
 import com.psb.model.spotify.SpotifyPlaylists;
 import com.psb.model.spotify.SpotifyTrack;
 import com.psb.model.spotify.SpotifyTracks;
+import com.psb.model.spotify.SpotifyUser;
 
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -121,6 +122,13 @@ public class SpotifyUtil {
 		testArtist.setName(Constants.TEST_ARTIST_NAME);
 		return testArtist;
 	}
+	
+	public SpotifyUser createTestUser() {
+		SpotifyUser testUser = new SpotifyUser();
+		testUser.setDisplayName("Display name");
+		testUser.setId("id");
+		return testUser;
+	}
 
 	public void addMockPlaylistsResponse(SpotifyPlaylists playlists, MockWebServer server) {
 		try {
@@ -171,6 +179,15 @@ public class SpotifyUtil {
 			} catch (JsonProcessingException e) {
 				e.printStackTrace();
 			}
+		}
+	}
+
+	public void addMockUserResponse(SpotifyUser testUser, MockWebServer server) {
+		try {
+			server.enqueue(new MockResponse().setBody(this.objectMapper.writeValueAsString(testUser))
+					.addHeader("Content-Type", "application/json"));
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
 		}
 	}
 

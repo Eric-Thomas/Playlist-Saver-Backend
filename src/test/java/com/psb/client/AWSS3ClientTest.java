@@ -21,6 +21,7 @@ import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
+import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 
@@ -66,6 +67,14 @@ class AWSS3ClientTest {
 	void testGetDataException() {
 		when(s3.getObjectAsBytes(Mockito.any(GetObjectRequest.class))).thenThrow(new RuntimeException());
 		assertThrows(AWSS3ClientException.class, () -> {
+			s3Client.getData("objectKey");
+		});
+	}
+	
+	@Test
+	void testGetDataNoSuchKeyException() {
+		when(s3.getObjectAsBytes(Mockito.any(GetObjectRequest.class))).thenThrow(NoSuchKeyException.class);
+		assertThrows(AWSS3ClientNotFoundException.class, () -> {
 			s3Client.getData("objectKey");
 		});
 	}

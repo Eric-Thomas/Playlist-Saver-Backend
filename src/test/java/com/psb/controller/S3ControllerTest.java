@@ -18,6 +18,9 @@ import com.psb.client.AWSS3Client;
 import com.psb.exception.AWSS3ClientException;
 import com.psb.exception.AWSS3ClientNotFoundException;
 
+import software.amazon.awssdk.core.ResponseBytes;
+import software.amazon.awssdk.services.s3.model.GetObjectResponse;
+
 @WebMvcTest(controllers = { S3Controller.class })
 class S3ControllerTest {
 
@@ -27,25 +30,26 @@ class S3ControllerTest {
 	@MockBean
 	private AWSS3Client s3Client;
 
+	private static final String S3_LOAD_URL = "/s3/load";
 	private static final String ERROR_MESSAGE = "Test error message";
 
 	@Test
 	void testLoadError() throws Exception {
 		when(s3Client.getData(Mockito.anyString())).thenThrow(new AWSS3ClientException(ERROR_MESSAGE));
 		this.mockMvc
-				.perform(MockMvcRequestBuilders.get("/s3/load").accept(MediaType.APPLICATION_JSON)
+				.perform(MockMvcRequestBuilders.get(S3_LOAD_URL).accept(MediaType.APPLICATION_JSON)
 						.contentType(MediaType.APPLICATION_JSON).param("id", "test"))
 				.andExpect(status().isServiceUnavailable())
 				.andExpect(content().string(containsString("Error calling S3. Try again later")))
 				.andExpect(content().string(containsString(ERROR_MESSAGE)));
 	}
-	
+
 	@Test
 	void testLoadNotFound() throws Exception {
 		when(s3Client.getData(Mockito.anyString())).thenThrow(new AWSS3ClientNotFoundException(ERROR_MESSAGE));
 		this.mockMvc
-				.perform(MockMvcRequestBuilders.get("/s3/load").accept(MediaType.APPLICATION_JSON)
-						.contentType(MediaType.APPLICATION_JSON).param("id", "test"))
+				.perform(MockMvcRequestBuilders.get(S3_LOAD_URL).accept(MediaType.APPLICATION_JSON)
+						.contentType(MediaType.APPLICATION_JSON).param("id", "Invalid ID"))
 				.andExpect(status().isNotFound())
 				.andExpect(content().string(containsString("Error calling S3 404 Not Found.")))
 				.andExpect(content().string(containsString(ERROR_MESSAGE)));

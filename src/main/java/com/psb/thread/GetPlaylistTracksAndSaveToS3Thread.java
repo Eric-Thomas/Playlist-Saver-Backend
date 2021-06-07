@@ -46,10 +46,8 @@ public class GetPlaylistTracksAndSaveToS3Thread implements Runnable {
 			saveToS3(objectKey, repositoryPlaylist);
 		}
 		} catch (SpotifyClientException | SpotifyClientUnauthorizedException e) {
-			// TODO put error Message in s3
 			e.printStackTrace();
 		} catch (AWSS3ClientException e ) {
-			// TODO figure it out
 			e.printStackTrace();
 		}
 

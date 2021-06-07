@@ -58,17 +58,17 @@ public class AWSS3Client {
 		}
 	}
 
-	public ResponseBytes<GetObjectResponse> getData(String objectKey) throws AWSS3ClientException, AWSS3ClientNotFoundException {
+	public ResponseBytes<GetObjectResponse> getData(String objectKey)
+			throws AWSS3ClientException, AWSS3ClientNotFoundException {
 		try {
 			// LMAO java doesn't have import aliasing so one RequestBody must use the fully
 			// qualified name
 			GetObjectRequest s3Request = GetObjectRequest.builder().bucket(bucketName).key(objectKey).build();
 			return s3.getObjectAsBytes(s3Request);
 		} catch (NoSuchKeyException e) {
-			throw new AWSS3ClientNotFoundException("Error getting object from s3: Ojbect key: " + objectKey + " does not exist");
-		}
-		
-		catch (Exception e) {
+			throw new AWSS3ClientNotFoundException(
+					"Error getting object from s3: Ojbect key: " + objectKey + " does not exist");
+		} catch (Exception e) {
 			logger.error(e.getMessage());
 			throw new AWSS3ClientException("Error getting object from s3\n" + e.getMessage());
 		}

@@ -16,6 +16,7 @@ public class RepositoryUtil {
 		testPlaylist.setPlaylistName(Constants.TEST_PLAYLIST_NAME);
 		testPlaylist.setTracks(
 				createTestTracks());
+		testPlaylist.setId(Constants.TEST_PLAYLIST_ID);
 		return testPlaylist;
 	}
 

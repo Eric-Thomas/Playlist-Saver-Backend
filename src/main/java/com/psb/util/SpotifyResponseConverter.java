@@ -22,6 +22,7 @@ public class SpotifyResponseConverter {
 		Playlist repositoryPlaylist = new Playlist();
 		repositoryPlaylist.setPlaylistName(spotifyPlaylist.getName());
 		repositoryPlaylist.setTracks(convertTracks(spotifyTracks));
+		repositoryPlaylist.setId(spotifyPlaylist.getId());
 		return repositoryPlaylist;
 	}
 

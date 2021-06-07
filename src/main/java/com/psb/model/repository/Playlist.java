@@ -14,5 +14,6 @@ public class Playlist implements Serializable {
 	private static final long serialVersionUID = 1680150966024931641L;
 	private String playlistName;
 	private List<Track> tracks;
+	private String id;
 
 }

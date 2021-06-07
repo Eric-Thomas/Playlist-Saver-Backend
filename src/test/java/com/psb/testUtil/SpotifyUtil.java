@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.psb.constants.Constants;
 import com.psb.model.spotify.SpotifyAlbum;
 import com.psb.model.spotify.SpotifyArtist;
+import com.psb.model.spotify.SpotifyImage;
 import com.psb.model.spotify.SpotifyPlaylist;
 import com.psb.model.spotify.SpotifyPlaylists;
 import com.psb.model.spotify.SpotifyTrack;
@@ -60,6 +61,10 @@ public class SpotifyUtil {
 		SpotifyPlaylist testPlaylist = new SpotifyPlaylist();
 		testPlaylist.setName(Constants.TEST_PLAYLIST_NAME);
 		testPlaylist.setTracksUrl(this.mockServerUrl + Constants.TRACKS_URL);
+		List<SpotifyImage> images = new ArrayList<>();
+		images.add(createTestImage());
+		testPlaylist.setImages(images);
+		testPlaylist.setId(Constants.TEST_PLAYLIST_ID);
 		return testPlaylist;
 	}
 
@@ -95,7 +100,14 @@ public class SpotifyUtil {
 		testTrack.setName(Constants.TEST_SONG_NAME);
 		testTrack.setUri("Test uri");
 		return testTrack;
-
+	}
+	
+	public SpotifyImage createTestImage() {
+		SpotifyImage image = new SpotifyImage();
+		image.setHeight("500");
+		image.setWidth("500");
+		image.setUrl(Constants.TEST_PLAYLIST_IMAGE_URL);
+		return image;
 	}
 
 	public SpotifyAlbum createTestAlbum() {

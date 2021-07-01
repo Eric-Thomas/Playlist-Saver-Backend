@@ -14,7 +14,7 @@ import com.psb.client.AWSS3Client;
 import com.psb.client.SpotifyClient;
 import com.psb.exception.SpotifyClientException;
 import com.psb.exception.SpotifyClientUnauthorizedException;
-import com.psb.model.repository.PlaylistInfo;
+import com.psb.model.spotify.PlaylistInfo;
 import com.psb.model.spotify.SpotifyPlaylist;
 import com.psb.model.spotify.SpotifyPlaylists;
 import com.psb.thread.GetPlaylistTracksAndSaveToS3Thread;

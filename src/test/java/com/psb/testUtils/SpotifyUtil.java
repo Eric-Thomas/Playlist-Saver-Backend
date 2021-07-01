@@ -1,4 +1,4 @@
-package com.psb.testUtil;
+package com.psb.testUtils;
 
 import java.util.ArrayList;
 import java.util.List;

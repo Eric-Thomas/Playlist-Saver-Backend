@@ -18,9 +18,6 @@ import com.psb.client.AWSS3Client;
 import com.psb.exception.AWSS3ClientException;
 import com.psb.exception.AWSS3ClientNotFoundException;
 
-import software.amazon.awssdk.core.ResponseBytes;
-import software.amazon.awssdk.services.s3.model.GetObjectResponse;
-
 @WebMvcTest(controllers = { S3Controller.class })
 class S3ControllerTest {
 

@@ -22,7 +22,7 @@ import com.psb.model.spotify.SpotifyPlaylists;
 import com.psb.model.spotify.SpotifyTrack;
 import com.psb.model.spotify.SpotifyTracks;
 import com.psb.model.spotify.SpotifyUser;
-import com.psb.testUtil.SpotifyUtil;
+import com.psb.testUtils.SpotifyUtil;
 
 import okhttp3.mockwebserver.MockWebServer;
 

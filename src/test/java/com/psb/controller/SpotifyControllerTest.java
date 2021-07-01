@@ -23,10 +23,7 @@ import com.psb.exception.SpotifyClientException;
 import com.psb.exception.SpotifyClientUnauthorizedException;
 import com.psb.model.spotify.SpotifyPlaylist;
 import com.psb.model.spotify.SpotifyPlaylists;
-import com.psb.model.spotify.SpotifyTracks;
-import com.psb.testUtil.RepositoryUtil;
-import com.psb.testUtil.SpotifyUtil;
-import com.psb.util.SpotifyResponseConverter;
+import com.psb.testUtils.SpotifyUtil;
 
 @WebMvcTest(controllers = { SpotifyController.class })
 class SpotifyControllerTest {
@@ -38,13 +35,11 @@ class SpotifyControllerTest {
 	private MockMvc mockMvc;
 
 	@MockBean
-	private SpotifyResponseConverter spotifyResponseConverter;
-	@MockBean
 	private SpotifyClient spotifyClient;
 	@MockBean
 	private AWSS3Client s3Client;
+	
 	private SpotifyUtil spotifyUtil = new SpotifyUtil();
-	private RepositoryUtil repositoryUtil = new RepositoryUtil();
 
 	private static final String OAUTH = "oauthToken";
 	private static final String ERROR_MESSAGE = "Test error message";
@@ -61,8 +56,6 @@ class SpotifyControllerTest {
 		when(spotifyClient.getPlaylists(Mockito.any(String.class))).thenReturn(testPlaylists);
 		when(spotifyClient.getPlaylistTracks(Mockito.any(String.class), Mockito.any(SpotifyPlaylist.class)))
 				.thenReturn(spotifyUtil.createTestTracks());
-		when(spotifyResponseConverter.convertPlaylist(Mockito.any(SpotifyPlaylist.class),
-				Mockito.any(SpotifyTracks.class))).thenReturn(repositoryUtil.createTestRepositoryPlaylist());
 
 		this.mockMvc
 				.perform(MockMvcRequestBuilders.get(PLAYLISTS_URL).contentType(MediaType.APPLICATION_JSON)

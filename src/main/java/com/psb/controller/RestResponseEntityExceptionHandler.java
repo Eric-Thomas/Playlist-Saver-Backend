@@ -19,25 +19,25 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
 	@ExceptionHandler(value = { SpotifyClientUnauthorizedException.class })
 	protected ResponseEntity<Object> handleWebClientConflict(SpotifyClientUnauthorizedException ex,
 			WebRequest request) {
-		String bodyOfResponse = "Error calling spotify api. " + ex.toString();
+		String bodyOfResponse = "Error calling spotify api. " + ex.getMessage();
 		return handleExceptionInternal(ex, bodyOfResponse, new HttpHeaders(), HttpStatus.UNAUTHORIZED, request);
 	}
 
 	@ExceptionHandler(value = { AWSS3ClientException.class })
 	protected ResponseEntity<Object> handleS3Exception(AWSS3ClientException ex, WebRequest request) {
-		String bodyOfResponse = "Error calling S3. Try again later. " + ex.toString();
+		String bodyOfResponse = "Error calling S3. Try again later. " + ex.getMessage();
 		return handleExceptionInternal(ex, bodyOfResponse, new HttpHeaders(), HttpStatus.SERVICE_UNAVAILABLE, request);
 	}
 	
 	@ExceptionHandler(value = { AWSS3ClientNotFoundException.class })
 	protected ResponseEntity<Object> handleS3Exception(AWSS3ClientNotFoundException ex, WebRequest request) {
-		String bodyOfResponse = "Error calling S3 404 Not Found. " + ex.toString();
+		String bodyOfResponse = "Error calling S3 404 Not Found. " + ex.getMessage();
 		return handleExceptionInternal(ex, bodyOfResponse, new HttpHeaders(), HttpStatus.NOT_FOUND, request);
 	}
 
 	@ExceptionHandler(value = { SpotifyClientException.class })
 	protected ResponseEntity<Object> handleSpotifyException(SpotifyClientException ex, WebRequest request) {
-		String bodyOfResponse = "Error calling spotify api. " + ex.toString();
+		String bodyOfResponse = "Error calling spotify api. " + ex.getMessage();
 		return handleExceptionInternal(ex, bodyOfResponse, new HttpHeaders(), HttpStatus.SERVICE_UNAVAILABLE, request);
 	}
 }

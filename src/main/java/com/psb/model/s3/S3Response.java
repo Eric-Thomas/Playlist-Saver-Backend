@@ -1,4 +1,4 @@
-package com.psb.model.repository;
+package com.psb.model.s3;
 
 import lombok.Data;
 

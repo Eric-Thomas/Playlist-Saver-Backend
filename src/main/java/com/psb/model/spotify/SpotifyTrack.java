@@ -1,5 +1,6 @@
 package com.psb.model.spotify;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
@@ -12,8 +13,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 
 @Data
-public class SpotifyTrack {
+public class SpotifyTrack implements Serializable {
 
+	private static final long serialVersionUID = 8974061123163303142L;
+	
 	private String name;
 	private String uri;
 	private SpotifyAlbum album;

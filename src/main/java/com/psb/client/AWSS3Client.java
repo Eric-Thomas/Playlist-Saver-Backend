@@ -1,5 +1,9 @@
 package com.psb.client;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ListIterator;
+
 import javax.annotation.PreDestroy;
 
 import org.slf4j.Logger;
@@ -7,18 +11,24 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.SerializationUtils;
 
 import com.psb.exception.AWSS3ClientException;
 import com.psb.exception.AWSS3ClientNotFoundException;
 import com.psb.model.s3.S3Response;
+import com.psb.util.Compresser;
 
 import software.amazon.awssdk.core.ResponseBytes;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.CommonPrefix;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
+import software.amazon.awssdk.services.s3.model.ListObjectsRequest;
+import software.amazon.awssdk.services.s3.model.ListObjectsResponse;
 import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectResponse;
+import software.amazon.awssdk.services.s3.model.S3Object;
 
 @Component
 public class AWSS3Client {
@@ -58,7 +68,7 @@ public class AWSS3Client {
 		}
 	}
 
-	public ResponseBytes<GetObjectResponse> getData(String objectKey)
+	public ResponseBytes<GetObjectResponse> getPlaylist(String objectKey)
 			throws AWSS3ClientException, AWSS3ClientNotFoundException {
 		try {
 			// LMAO java doesn't have import aliasing so one RequestBody must use the fully
@@ -72,6 +82,59 @@ public class AWSS3Client {
 			logger.error(e.getMessage());
 			throw new AWSS3ClientException("Error getting object from s3\n" + e.getMessage());
 		}
+	}
+
+	public List<Object> getPlaylists(String userID) throws AWSS3ClientException, AWSS3ClientNotFoundException {
+
+		List<Object> o = new ArrayList<>();
+
+		String prefix = userID + "/";
+		ListObjectsRequest listObjects = ListObjectsRequest.builder().bucket(bucketName).prefix(prefix).build();
+
+		ListObjectsResponse res = s3.listObjects(listObjects);
+		List<S3Object> objects = res.contents();
+		
+		logger.info("objects: {}", objects);
+		
+		if (objects.isEmpty()) {
+			throw new AWSS3ClientNotFoundException(
+					"Error getting object from s3: user: " + userID + " does not exist");
+		}
+
+		for (ListIterator<S3Object> iterVals = objects.listIterator(); iterVals.hasNext();) {
+			S3Object s3Object = (S3Object) iterVals.next();
+			ResponseBytes<GetObjectResponse> objectBytes = getPlaylist(s3Object.key());
+			Object object = SerializationUtils.deserialize(Compresser.decompress(objectBytes.asByteArray()));
+			o.add(object);
+		}
+
+		return o;
+	}
+
+	public List<String> getAllUsers() throws AWSS3ClientException {
+		String delimiter = "/";
+
+		ListObjectsRequest listObjectsRequest = ListObjectsRequest.builder().bucket(bucketName).delimiter(delimiter)
+				.build();
+		try {
+			ListObjectsResponse objects = s3.listObjects(listObjectsRequest);
+			List<CommonPrefix> prefixes = objects.commonPrefixes();
+
+			List<String> users = new ArrayList<>();
+			for (CommonPrefix prefix : prefixes) {
+				// Prefix of path name is username
+				String username = prefix.prefix();
+				username = username.substring(0, username.indexOf(delimiter));
+				users.add(username);
+			}
+
+			return users;
+
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			throw new AWSS3ClientException("Error getting object from s3\n" + e.getMessage());
+		}
+
 	}
 
 }

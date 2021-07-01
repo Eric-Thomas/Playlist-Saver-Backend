@@ -129,9 +129,9 @@ public class SpotifyClient {
 		return tracks;
 	}
 
-	public String getUserName(String oauthToken) throws SpotifyClientUnauthorizedException, SpotifyClientException {
+	public String getUserID(String oauthToken) throws SpotifyClientUnauthorizedException, SpotifyClientException {
 		try {
-			return tryGetUsername(oauthToken);
+			return tryGetUserID(oauthToken);
 		} catch (RuntimeException e) {
 			if (e.getCause().getClass() == SpotifyClientUnauthorizedException.class) {
 				throw new SpotifyClientUnauthorizedException(e.getMessage());
@@ -143,7 +143,7 @@ public class SpotifyClient {
 		return null;
 	}
 
-	private String tryGetUsername(String oauthToken) {
+	private String tryGetUserID(String oauthToken) {
 		logger.info("Getting username...");
 		SpotifyUser user = client.get().uri(userInfoUrl).headers(httpHeaders -> httpHeaders.setBearerAuth(oauthToken))
 				.retrieve().onStatus(HttpStatus::isError, response -> {

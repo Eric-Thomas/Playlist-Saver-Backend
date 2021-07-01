@@ -27,26 +27,26 @@ class S3ControllerTest {
 	@MockBean
 	private AWSS3Client s3Client;
 
-	private static final String S3_LOAD_URL = "/s3/load";
+	private static final String S3_LOAD_Playlists_URL = "/s3/load/users/id/playlists";
 	private static final String ERROR_MESSAGE = "Test error message";
 
 	@Test
 	void testLoadError() throws Exception {
-		when(s3Client.getData(Mockito.anyString())).thenThrow(new AWSS3ClientException(ERROR_MESSAGE));
+		when(s3Client.getPlaylists(Mockito.anyString())).thenThrow(new AWSS3ClientException(ERROR_MESSAGE));
 		this.mockMvc
-				.perform(MockMvcRequestBuilders.get(S3_LOAD_URL).accept(MediaType.APPLICATION_JSON)
-						.contentType(MediaType.APPLICATION_JSON).param("id", "test"))
+				.perform(MockMvcRequestBuilders.get(S3_LOAD_Playlists_URL).accept(MediaType.APPLICATION_JSON)
+						.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isServiceUnavailable())
 				.andExpect(content().string(containsString("Error calling S3. Try again later")))
 				.andExpect(content().string(containsString(ERROR_MESSAGE)));
 	}
 
 	@Test
-	void testLoadNotFound() throws Exception {
-		when(s3Client.getData(Mockito.anyString())).thenThrow(new AWSS3ClientNotFoundException(ERROR_MESSAGE));
+	void testLoadPlaylistsUserNotFound() throws Exception {
+		when(s3Client.getPlaylists(Mockito.anyString())).thenThrow(new AWSS3ClientNotFoundException(ERROR_MESSAGE));
 		this.mockMvc
-				.perform(MockMvcRequestBuilders.get(S3_LOAD_URL).accept(MediaType.APPLICATION_JSON)
-						.contentType(MediaType.APPLICATION_JSON).param("id", "Invalid ID"))
+				.perform(MockMvcRequestBuilders.get(S3_LOAD_Playlists_URL).accept(MediaType.APPLICATION_JSON)
+						.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isNotFound())
 				.andExpect(content().string(containsString("Error calling S3 404 Not Found.")))
 				.andExpect(content().string(containsString(ERROR_MESSAGE)));

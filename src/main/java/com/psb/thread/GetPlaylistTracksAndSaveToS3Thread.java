@@ -36,9 +36,9 @@ public class GetPlaylistTracksAndSaveToS3Thread implements Runnable {
 		String folderPath = null;
 		for (SpotifyPlaylist playlist : playlists.getPlaylists()) {
 			if (folderPath == null) {
-				folderPath = spotifyClient.getUserName(oauthToken);
+				folderPath = spotifyClient.getUserID(oauthToken);
 			}
-			// Spotify usernames are unique, so we'll use those to identify bucket objects
+			// Spotify userIDs are unique, so we'll use those to identify bucket objects
 			String objectKey = folderPath + "/" + playlist.getId();
 			SpotifyTracks tracks = spotifyClient.getPlaylistTracks(oauthToken, playlist);
 			S3Playlist s3Playlist = new S3Playlist(playlist, tracks);

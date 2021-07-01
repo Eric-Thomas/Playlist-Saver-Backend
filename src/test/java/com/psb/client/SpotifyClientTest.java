@@ -171,14 +171,14 @@ class SpotifyClientTest {
 	void testGetUsername() throws SpotifyClientUnauthorizedException, SpotifyClientException {
 		SpotifyUser testUser = spotifyUtil.createTestUser();
 		spotifyUtil.addMockUserResponse(testUser, mockSpotifyServer);
-		assertEquals(testUser.getId(), spotifyClient.getUserName("oauth"));
+		assertEquals(testUser.getId(), spotifyClient.getUserID("oauth"));
 	}
 	
 	@Test
 	void testGetUsernameUnauthorized() {
 		spotifyUtil.addUnauthorizedResponse(mockSpotifyServer);
 		assertThrows(SpotifyClientUnauthorizedException.class, () -> {
-			spotifyClient.getUserName("oauthToken");
+			spotifyClient.getUserID("oauthToken");
 		});
 	}
 	
@@ -186,7 +186,7 @@ class SpotifyClientTest {
 	void testGetUsername5xxError() {
 		spotifyUtil.add5xxResponse(mockSpotifyServer);
 		assertThrows(SpotifyClientException.class, () -> {
-			spotifyClient.getUserName("oauthToken");
+			spotifyClient.getUserID("oauthToken");
 		});
 	}
 

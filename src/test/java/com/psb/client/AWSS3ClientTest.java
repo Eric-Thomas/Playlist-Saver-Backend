@@ -59,7 +59,7 @@ class AWSS3ClientTest {
 		ResponseBytes<GetObjectResponse> resp = null;
 		when(s3.getObjectAsBytes(Mockito.any(GetObjectRequest.class))).thenReturn(resp);
 		ResponseBytes<GetObjectResponse> excpectedResp = resp;
-		ResponseBytes<GetObjectResponse> actualResp = s3Client.getData("objectKey");
+		ResponseBytes<GetObjectResponse> actualResp = s3Client.getPlaylist("objectKey");
 		assertEquals(excpectedResp, actualResp);
 	}
 
@@ -67,7 +67,7 @@ class AWSS3ClientTest {
 	void testGetDataException() {
 		when(s3.getObjectAsBytes(Mockito.any(GetObjectRequest.class))).thenThrow(new RuntimeException());
 		assertThrows(AWSS3ClientException.class, () -> {
-			s3Client.getData("objectKey");
+			s3Client.getPlaylist("objectKey");
 		});
 	}
 	
@@ -75,7 +75,7 @@ class AWSS3ClientTest {
 	void testGetDataNoSuchKeyException() {
 		when(s3.getObjectAsBytes(Mockito.any(GetObjectRequest.class))).thenThrow(NoSuchKeyException.class);
 		assertThrows(AWSS3ClientNotFoundException.class, () -> {
-			s3Client.getData("objectKey");
+			s3Client.getPlaylist("objectKey");
 		});
 	}
 

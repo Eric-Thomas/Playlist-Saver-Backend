@@ -17,6 +17,7 @@ import com.psb.exception.SpotifyClientUnauthorizedException;
 import com.psb.model.spotify.PlaylistInfo;
 import com.psb.model.spotify.SpotifyPlaylist;
 import com.psb.model.spotify.SpotifyPlaylists;
+import com.psb.model.spotify.SpotifyUser;
 import com.psb.thread.GetPlaylistTracksAndSaveToS3Thread;
 
 @RestController
@@ -54,5 +55,11 @@ public class SpotifyController {
 	private void getPlaylistsTracksAndSaveToS3(String oauthToken, SpotifyPlaylists playlists) {
 		Thread t = new Thread(new GetPlaylistTracksAndSaveToS3Thread(oauthToken, playlists, spotifyClient, s3Client));
 		t.start();
+	}
+
+	@GetMapping(path = "/user/info")
+	public SpotifyUser getUserInfo(@RequestHeader String oauthToken)
+			throws SpotifyClientUnauthorizedException, SpotifyClientException {
+		return spotifyClient.getUser(oauthToken);
 	}
 }

@@ -129,9 +129,9 @@ public class SpotifyClient {
 		return tracks;
 	}
 
-	public String getUserID(String oauthToken) throws SpotifyClientUnauthorizedException, SpotifyClientException {
+	public SpotifyUser getUser(String oauthToken) throws SpotifyClientUnauthorizedException, SpotifyClientException {
 		try {
-			return tryGetUserID(oauthToken);
+			return tryGetUser(oauthToken);
 		} catch (RuntimeException e) {
 			if (e.getCause().getClass() == SpotifyClientUnauthorizedException.class) {
 				throw new SpotifyClientUnauthorizedException(e.getMessage());
@@ -143,9 +143,9 @@ public class SpotifyClient {
 		return null;
 	}
 
-	private String tryGetUserID(String oauthToken) {
+	private SpotifyUser tryGetUser(String oauthToken) {
 		logger.info("Getting username...");
-		SpotifyUser user = client.get().uri(userInfoUrl).headers(httpHeaders -> httpHeaders.setBearerAuth(oauthToken))
+		return client.get().uri(userInfoUrl).headers(httpHeaders -> httpHeaders.setBearerAuth(oauthToken))
 				.retrieve().onStatus(HttpStatus::isError, response -> {
 					if (response.statusCode() == HttpStatus.UNAUTHORIZED) {
 						return Mono.error(new SpotifyClientUnauthorizedException(UNAUTHORIZED_ERROR_MESSAGE));
@@ -153,11 +153,6 @@ public class SpotifyClient {
 						return Mono.error(new SpotifyClientException(response.statusCode().toString()));
 					}
 				}).bodyToMono(SpotifyUser.class).block();
-		if (user != null) {
-			return user.getId();
-		}
-
-		return null;
 	}
 
 }

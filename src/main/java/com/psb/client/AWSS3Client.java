@@ -1,8 +1,10 @@
 package com.psb.client;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 
 import javax.annotation.PreDestroy;
 
@@ -36,8 +38,10 @@ public class AWSS3Client {
 	@Value("${aws.bucket.name}")
 	private String bucketName;
 	private S3Client s3;
+	
 	private Logger logger = LoggerFactory.getLogger(AWSS3Client.class);
-
+	
+	private static final String DELIMITER = "/";
 	@Autowired
 	public AWSS3Client(S3Client s3) {
 		this.s3 = s3;
@@ -60,8 +64,6 @@ public class AWSS3Client {
 			response.setResult(s3Response.eTag()); // eTag is AWS's object hash, i.e. ideally unique ID
 			response.setSuccess(true);
 			response.setKilobytes(data.length / 1024);
-			logger.info("Data size: {} kB", response.getKilobytes());
-			logger.info("Tag information: {}", response.getResult());
 			return response;
 		} catch (Exception e) {
 			throw new AWSS3ClientException("Error putting object to s3\n" + e.getMessage());
@@ -111,30 +113,36 @@ public class AWSS3Client {
 		return o;
 	}
 
-	public List<String> getAllUsers() throws AWSS3ClientException {
-		String delimiter = "/";
-
-		ListObjectsRequest listObjectsRequest = ListObjectsRequest.builder().bucket(bucketName).delimiter(delimiter)
+	public Map<String, String> getAllUsers() throws AWSS3ClientException {
+		ListObjectsRequest listObjectsRequest = ListObjectsRequest.builder().bucket(bucketName).delimiter(DELIMITER)
 				.build();
 		try {
 			ListObjectsResponse objects = s3.listObjects(listObjectsRequest);
 			List<CommonPrefix> prefixes = objects.commonPrefixes();
-
-			List<String> users = new ArrayList<>();
-			for (CommonPrefix prefix : prefixes) {
-				// Prefix of path name is username
-				String username = prefix.prefix();
-				username = username.substring(0, username.indexOf(delimiter));
-				users.add(username);
-			}
-
-			return users;
+			return addUsers(prefixes);
 
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			throw new AWSS3ClientException("Error getting object from s3\n" + e.getMessage());
 		}
-
+	}
+	
+	private Map<String, String> addUsers(List<CommonPrefix> userIDs){
+		Map<String, String> users = new HashMap<>();
+		for (CommonPrefix userID : userIDs) {
+			String idPrefix = userID.prefix();
+			ListObjectsRequest listObjectsRequest = ListObjectsRequest.builder().bucket(bucketName).delimiter(DELIMITER).prefix(idPrefix)
+					.build();
+			ListObjectsResponse objects = s3.listObjects(listObjectsRequest);
+			String displayName = getDisplayName(objects.commonPrefixes().get(0).prefix());
+			String id = idPrefix.substring(0, idPrefix.indexOf(DELIMITER));
+			users.put(id, displayName);
+		}
+		return users;
+	}
+	
+	private String getDisplayName(String fullPrefix) {
+		return fullPrefix.substring(fullPrefix.indexOf(DELIMITER)+1, fullPrefix.length()-1);
 	}
 
 }

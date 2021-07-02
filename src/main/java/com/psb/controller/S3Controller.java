@@ -1,6 +1,7 @@
 package com.psb.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,7 +31,7 @@ public class S3Controller {
 	}
 	
 	@GetMapping(path = "/load/users")
-	public List<String> loadUsers() throws AWSS3ClientException {
+	public Map<String, String> loadUsers() throws AWSS3ClientException {
 		return s3Client.getAllUsers();
 	}
 

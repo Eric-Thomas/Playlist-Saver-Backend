@@ -38,10 +38,10 @@ public class AWSS3Client {
 	@Value("${aws.bucket.name}")
 	private String bucketName;
 	private S3Client s3;
+	@Value("${s3.path.delimiter}")
+	private String delimiter;
 	
 	private Logger logger = LoggerFactory.getLogger(AWSS3Client.class);
-	
-	private static final String DELIMITER = "/";
 	@Autowired
 	public AWSS3Client(S3Client s3) {
 		this.s3 = s3;
@@ -81,7 +81,6 @@ public class AWSS3Client {
 			throw new AWSS3ClientNotFoundException(
 					"Error getting object from s3: Ojbect key: " + objectKey + " does not exist");
 		} catch (Exception e) {
-			logger.error(e.getMessage());
 			throw new AWSS3ClientException("Error getting object from s3\n" + e.getMessage());
 		}
 	}
@@ -90,13 +89,11 @@ public class AWSS3Client {
 
 		List<Object> o = new ArrayList<>();
 
-		String prefix = userID + "/";
+		String prefix = userID + delimiter;
 		ListObjectsRequest listObjects = ListObjectsRequest.builder().bucket(bucketName).prefix(prefix).build();
 
 		ListObjectsResponse res = s3.listObjects(listObjects);
 		List<S3Object> objects = res.contents();
-		
-		logger.info("objects: {}", objects);
 		
 		if (objects.isEmpty()) {
 			throw new AWSS3ClientNotFoundException(
@@ -104,7 +101,7 @@ public class AWSS3Client {
 		}
 
 		for (ListIterator<S3Object> iterVals = objects.listIterator(); iterVals.hasNext();) {
-			S3Object s3Object = (S3Object) iterVals.next();
+			S3Object s3Object = iterVals.next();
 			ResponseBytes<GetObjectResponse> objectBytes = getPlaylist(s3Object.key());
 			Object object = SerializationUtils.deserialize(Compresser.decompress(objectBytes.asByteArray()));
 			o.add(object);
@@ -114,7 +111,7 @@ public class AWSS3Client {
 	}
 
 	public Map<String, String> getAllUsers() throws AWSS3ClientException {
-		ListObjectsRequest listObjectsRequest = ListObjectsRequest.builder().bucket(bucketName).delimiter(DELIMITER)
+		ListObjectsRequest listObjectsRequest = ListObjectsRequest.builder().bucket(bucketName).delimiter(delimiter)
 				.build();
 		try {
 			ListObjectsResponse objects = s3.listObjects(listObjectsRequest);
@@ -122,7 +119,6 @@ public class AWSS3Client {
 			return addUsers(prefixes);
 
 		} catch (Exception e) {
-			logger.error(e.getMessage());
 			throw new AWSS3ClientException("Error getting object from s3\n" + e.getMessage());
 		}
 	}
@@ -131,18 +127,18 @@ public class AWSS3Client {
 		Map<String, String> users = new HashMap<>();
 		for (CommonPrefix userID : userIDs) {
 			String idPrefix = userID.prefix();
-			ListObjectsRequest listObjectsRequest = ListObjectsRequest.builder().bucket(bucketName).delimiter(DELIMITER).prefix(idPrefix)
+			ListObjectsRequest listObjectsRequest = ListObjectsRequest.builder().bucket(bucketName).delimiter(delimiter).prefix(idPrefix)
 					.build();
 			ListObjectsResponse objects = s3.listObjects(listObjectsRequest);
 			String displayName = getDisplayName(objects.commonPrefixes().get(0).prefix());
-			String id = idPrefix.substring(0, idPrefix.indexOf(DELIMITER));
+			String id = idPrefix.substring(0, idPrefix.indexOf(delimiter));
 			users.put(id, displayName);
 		}
 		return users;
 	}
 	
 	private String getDisplayName(String fullPrefix) {
-		return fullPrefix.substring(fullPrefix.indexOf(DELIMITER)+1, fullPrefix.length()-1);
+		return fullPrefix.substring(fullPrefix.indexOf(delimiter)+1, fullPrefix.length()-1);
 	}
 
 }

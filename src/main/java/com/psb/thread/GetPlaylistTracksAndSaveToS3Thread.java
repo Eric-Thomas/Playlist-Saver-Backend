@@ -1,6 +1,7 @@
 package com.psb.thread;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.SerializationUtils;
 
 import com.psb.client.AWSS3Client;
@@ -17,6 +18,8 @@ import com.psb.util.Compresser;
 
 public class GetPlaylistTracksAndSaveToS3Thread implements Runnable {
 
+	@Value("{s3.path.delimiter}")
+	private String delimiter;
 	private String oauthToken;
 	private SpotifyPlaylists playlists;
 	private SpotifyClient spotifyClient;
@@ -38,10 +41,10 @@ public class GetPlaylistTracksAndSaveToS3Thread implements Runnable {
 		for (SpotifyPlaylist playlist : playlists.getPlaylists()) {
 			if (folderPath == null) {
 				SpotifyUser user = spotifyClient.getUser(oauthToken);
-				folderPath = user.getId() + "/" + user.getDisplayName();
+				folderPath = user.getId() + delimiter + user.getDisplayName();
 			}
 			// Spotify userIDs are unique, so we'll use those to identify bucket objects
-			String objectKey = folderPath + "/" + playlist.getId();
+			String objectKey = folderPath + delimiter + playlist.getId();
 			SpotifyTracks tracks = spotifyClient.getPlaylistTracks(oauthToken, playlist);
 			S3Playlist s3Playlist = new S3Playlist(playlist, tracks);
 			saveToS3(objectKey, s3Playlist);

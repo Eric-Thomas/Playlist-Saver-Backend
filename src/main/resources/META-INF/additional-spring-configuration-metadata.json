@@ -21,7 +21,11 @@
   },
   {
     "name": "runtime.env",
-    "type": "java.land.String",
+    "type": "java.lang.String",
     "description": "Runtime environment"
+  },  {
+    "name": "s3.path.delimiter",
+    "type": "java.lang.String",
+    "description": "delimiter for s3 file paths"
   }
 ]}

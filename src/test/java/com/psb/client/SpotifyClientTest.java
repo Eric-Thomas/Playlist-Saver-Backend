@@ -52,6 +52,7 @@ class SpotifyClientTest {
 		// Sets playlists url since it is a value drawn from properties file in the
 		// class under test
 		ReflectionTestUtils.setField(spotifyClient, "basePlaylistsUrl", "/");
+		ReflectionTestUtils.setField(spotifyClient, "userInfoUrl", "/");
 	}
 
 	@Test

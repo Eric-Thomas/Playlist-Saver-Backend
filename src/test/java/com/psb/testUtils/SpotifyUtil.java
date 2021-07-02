@@ -127,6 +127,9 @@ public class SpotifyUtil {
 		SpotifyUser testUser = new SpotifyUser();
 		testUser.setDisplayName("Display name");
 		testUser.setId("id");
+		List<SpotifyImage> images = new ArrayList<>();
+		images.add(createTestImage());
+		testUser.setImages(images);
 		return testUser;
 	}
 

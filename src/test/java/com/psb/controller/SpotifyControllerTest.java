@@ -23,6 +23,7 @@ import com.psb.exception.SpotifyClientException;
 import com.psb.exception.SpotifyClientUnauthorizedException;
 import com.psb.model.spotify.SpotifyPlaylist;
 import com.psb.model.spotify.SpotifyPlaylists;
+import com.psb.model.spotify.SpotifyUser;
 import com.psb.testUtils.SpotifyUtil;
 
 @WebMvcTest(controllers = { SpotifyController.class })
@@ -38,12 +39,13 @@ class SpotifyControllerTest {
 	private SpotifyClient spotifyClient;
 	@MockBean
 	private AWSS3Client s3Client;
-	
+
 	private SpotifyUtil spotifyUtil = new SpotifyUtil();
 
 	private static final String OAUTH = "oauthToken";
 	private static final String ERROR_MESSAGE = "Test error message";
 	private static final String PLAYLISTS_URL = "/spotify/playlists/info";
+	private static final String USER_INFO_URL = "/spotify/user/info";
 
 	@BeforeEach
 	public void initialize() {
@@ -67,7 +69,7 @@ class SpotifyControllerTest {
 
 	@Test
 	void testInvalidOauthToken() throws Exception {
-		when(spotifyClient.getPlaylists(Mockito.any(String.class)))
+		when(spotifyClient.getPlaylists(Mockito.anyString()))
 				.thenThrow(new SpotifyClientUnauthorizedException(ERROR_MESSAGE));
 		this.mockMvc
 				.perform(MockMvcRequestBuilders.get(PLAYLISTS_URL).contentType(MediaType.APPLICATION_JSON)
@@ -102,6 +104,17 @@ class SpotifyControllerTest {
 				.perform(MockMvcRequestBuilders.get(PLAYLISTS_URL).accept(MediaType.APPLICATION_JSON)
 						.header("OAUTHToken", OAUTH).contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isServiceUnavailable()).andExpect(content().string(containsString(ERROR_MESSAGE)));
+	}
+
+	@Test
+	void testGetUser() throws Exception {
+		SpotifyUser testUser = spotifyUtil.createTestUser();
+		when(spotifyClient.getUser(Mockito.anyString())).thenReturn(testUser);
+		this.mockMvc
+		.perform(MockMvcRequestBuilders.get(USER_INFO_URL).contentType(MediaType.APPLICATION_JSON)
+				.header("OAUTHToken", OAUTH))
+		.andExpect(status().isOk()).andExpect(content().string(containsString(testUser.getId())))
+		.andExpect(content().string(containsString(testUser.getDisplayName())));
 	}
 
 }

@@ -116,14 +116,14 @@ public class AWSS3Client {
 		try {
 			ListObjectsResponse objects = s3.listObjects(listObjectsRequest);
 			List<CommonPrefix> prefixes = objects.commonPrefixes();
-			return addUsers(prefixes);
+			return getDisplayNames(prefixes);
 
 		} catch (Exception e) {
 			throw new AWSS3ClientException("Error getting object from s3\n" + e.getMessage());
 		}
 	}
 	
-	private Map<String, String> addUsers(List<CommonPrefix> userIDs){
+	private Map<String, String> getDisplayNames(List<CommonPrefix> userIDs){
 		Map<String, String> users = new HashMap<>();
 		for (CommonPrefix userID : userIDs) {
 			String idPrefix = userID.prefix();

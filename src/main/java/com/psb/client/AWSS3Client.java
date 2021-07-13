@@ -1,10 +1,8 @@
 package com.psb.client;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Map;
 
 import javax.annotation.PreDestroy;
 
@@ -19,6 +17,7 @@ import com.psb.exception.AWSS3ClientException;
 import com.psb.exception.AWSS3ClientNotFoundException;
 import com.psb.model.s3.S3Playlist;
 import com.psb.model.s3.S3Response;
+import com.psb.model.s3.S3User;
 import com.psb.util.Compresser;
 
 import software.amazon.awssdk.core.ResponseBytes;
@@ -111,7 +110,7 @@ public class AWSS3Client {
 		return playlists;
 	}
 
-	public Map<String, String> getAllUsers() throws AWSS3ClientException {
+	public List<S3User> getAllUsers() throws AWSS3ClientException {
 		ListObjectsRequest listObjectsRequest = ListObjectsRequest.builder().bucket(bucketName).delimiter(delimiter)
 				.build();
 		try {
@@ -124,8 +123,8 @@ public class AWSS3Client {
 		}
 	}
 	
-	private Map<String, String> getDisplayNames(List<CommonPrefix> userIDs){
-		Map<String, String> users = new HashMap<>();
+	private List<S3User> getDisplayNames(List<CommonPrefix> userIDs){
+		List<S3User> users = new ArrayList<>();
 		for (CommonPrefix userID : userIDs) {
 			String idPrefix = userID.prefix();
 			ListObjectsRequest listObjectsRequest = ListObjectsRequest.builder().bucket(bucketName).delimiter(delimiter).prefix(idPrefix)
@@ -133,7 +132,10 @@ public class AWSS3Client {
 			ListObjectsResponse objects = s3.listObjects(listObjectsRequest);
 			String displayName = getDisplayName(objects.commonPrefixes().get(0).prefix());
 			String id = idPrefix.substring(0, idPrefix.indexOf(delimiter));
-			users.put(id, displayName);
+			S3User user = new S3User();
+			user.setDisplayName(displayName);
+			user.setId(id);
+			users.add(user);
 		}
 		return users;
 	}

@@ -17,6 +17,7 @@ import org.springframework.util.SerializationUtils;
 
 import com.psb.exception.AWSS3ClientException;
 import com.psb.exception.AWSS3ClientNotFoundException;
+import com.psb.model.s3.S3Playlist;
 import com.psb.model.s3.S3Response;
 import com.psb.util.Compresser;
 
@@ -85,9 +86,9 @@ public class AWSS3Client {
 		}
 	}
 
-	public List<Object> getPlaylists(String userID) throws AWSS3ClientException, AWSS3ClientNotFoundException {
+	public List<S3Playlist> getPlaylists(String userID) throws AWSS3ClientException, AWSS3ClientNotFoundException {
 
-		List<Object> o = new ArrayList<>();
+		List<S3Playlist> playlists = new ArrayList<>();
 
 		String prefix = userID + delimiter;
 		ListObjectsRequest listObjects = ListObjectsRequest.builder().bucket(bucketName).prefix(prefix).build();
@@ -103,11 +104,11 @@ public class AWSS3Client {
 		for (ListIterator<S3Object> iterVals = objects.listIterator(); iterVals.hasNext();) {
 			S3Object s3Object = iterVals.next();
 			ResponseBytes<GetObjectResponse> objectBytes = getPlaylist(s3Object.key());
-			Object object = SerializationUtils.deserialize(Compresser.decompress(objectBytes.asByteArray()));
-			o.add(object);
+			S3Playlist playlist = (S3Playlist) SerializationUtils.deserialize(Compresser.decompress(objectBytes.asByteArray()));
+			playlists.add((S3Playlist) playlist);
 		}
 
-		return o;
+		return playlists;
 	}
 
 	public Map<String, String> getAllUsers() throws AWSS3ClientException {

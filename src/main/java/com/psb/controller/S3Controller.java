@@ -1,5 +1,6 @@
 package com.psb.controller;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.psb.client.AWSS3Client;
 import com.psb.exception.AWSS3ClientException;
 import com.psb.exception.AWSS3ClientNotFoundException;
+import com.psb.model.s3.S3Playlist;
 
 @RestController
 @RequestMapping("/s3")
@@ -24,7 +26,7 @@ public class S3Controller {
 	}
 	
 	@GetMapping(path = "/load/users/{id}/playlists")
-	public Object loadPlaylists(@PathVariable String id) throws AWSS3ClientException, AWSS3ClientNotFoundException {
+	public List<S3Playlist> loadPlaylists(@PathVariable String id) throws AWSS3ClientException, AWSS3ClientNotFoundException {
 		return s3Client.getPlaylists(id);
 		
 	}

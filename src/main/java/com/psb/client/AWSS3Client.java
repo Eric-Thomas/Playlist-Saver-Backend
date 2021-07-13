@@ -104,7 +104,7 @@ public class AWSS3Client {
 			S3Object s3Object = iterVals.next();
 			ResponseBytes<GetObjectResponse> objectBytes = getPlaylist(s3Object.key());
 			S3Playlist playlist = (S3Playlist) SerializationUtils.deserialize(Compresser.decompress(objectBytes.asByteArray()));
-			playlists.add((S3Playlist) playlist);
+			playlists.add(playlist);
 		}
 
 		return playlists;

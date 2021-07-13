@@ -50,11 +50,10 @@ public class SpotifyClient {
 		} catch (RuntimeException e) {
 			if (e.getCause().getClass() == SpotifyClientUnauthorizedException.class) {
 				throw new SpotifyClientUnauthorizedException(e.getMessage());
-			} else if (e.getCause().getClass() == SpotifyClientException.class) {
+			} else {
 				throw new SpotifyClientException(e.getMessage());
 			}
 		}
-		return null;
 	}
 
 	private SpotifyPlaylists getPlaylistsWithPagination(String oauthToken) {
@@ -91,11 +90,10 @@ public class SpotifyClient {
 		} catch (RuntimeException e) {
 			if (e.getCause().getClass() == SpotifyClientUnauthorizedException.class) {
 				throw new SpotifyClientUnauthorizedException(e.getMessage());
-			} else if (e.getCause().getClass() == SpotifyClientException.class) {
+			} else {
 				throw new SpotifyClientException(e.getMessage());
 			}
 		}
-		return null;
 	}
 
 	private SpotifyTracks getPlaylistTracksWithPagination(String oauthToken, SpotifyPlaylist playlist) {

@@ -1,0 +1,31 @@
+{"properties": [
+  {
+    "name": "spotify.base.url",
+    "type": "java.lang.String",
+    "description": "Base URL for all spotify API endpoints"
+  },
+  {
+    "name": "aws.bucket.name",
+    "type": "java.lang.String",
+    "description": "Bucket to save playlists to"
+  },
+  {
+    "name": "spotify.playlists.uri",
+    "type": "java.lang.String",
+    "description": "Uri for getting spotify playlists"
+  },
+  {
+    "name": "spotify.user.profile.uri",
+    "type": "java.lang.String",
+    "description": "Uri for getting information about a user"
+  },
+  {
+    "name": "runtime.env",
+    "type": "java.lang.String",
+    "description": "Runtime environment"
+  },  {
+    "name": "s3.path.delimiter",
+    "type": "java.lang.String",
+    "description": "delimiter for s3 file paths"
+  }
+]}

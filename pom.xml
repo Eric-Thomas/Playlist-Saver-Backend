@@ -78,6 +78,12 @@
 		</dependency>
 
 		<dependency>
+			<artifactId>apache-client</artifactId>
+			<groupId>software.amazon.awssdk</groupId>
+			<version>2.15.50</version>
+		</dependency>
+
+		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>

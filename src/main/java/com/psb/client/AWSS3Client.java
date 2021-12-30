@@ -1,36 +1,18 @@
 package com.psb.client;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ListIterator;
 
-import javax.annotation.PreDestroy;
-
+import com.psb.exception.AWSS3ClientException;
+import com.psb.model.s3.S3Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.util.SerializationUtils;
-
-import com.psb.exception.AWSS3ClientException;
-import com.psb.exception.AWSS3ClientNotFoundException;
-import com.psb.model.s3.S3Playlist;
-import com.psb.model.s3.S3Response;
-import com.psb.model.s3.S3User;
-import com.psb.util.Compresser;
-
-import software.amazon.awssdk.core.ResponseBytes;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.CommonPrefix;
-import software.amazon.awssdk.services.s3.model.GetObjectRequest;
-import software.amazon.awssdk.services.s3.model.GetObjectResponse;
-import software.amazon.awssdk.services.s3.model.ListObjectsRequest;
-import software.amazon.awssdk.services.s3.model.ListObjectsResponse;
-import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectResponse;
-import software.amazon.awssdk.services.s3.model.S3Object;
+
+import javax.annotation.PreDestroy;
 
 @Component
 public class AWSS3Client {
@@ -61,12 +43,14 @@ public class AWSS3Client {
 			PutObjectResponse s3Response = s3.putObject(
 					PutObjectRequest.builder().bucket(bucketName).key(objectKey).build(),
 					software.amazon.awssdk.core.sync.RequestBody.fromBytes(data));
-			response.setResult(s3Response.eTag()); // eTag is AWS's object hash, i.e. ideally unique ID
+			response.setETag(s3Response.eTag()); // eTag is AWS's object hash, i.e. ideally unique ID
 			response.setSuccess(true);
-			response.setKilobytes(data.length / 1024);
+			response.setBytes(data.length);
+			response.setBucket(bucketName);
+			response.setObjectKey(objectKey);
 			return response;
 		} catch (Exception e) {
-			throw new AWSS3ClientException("Error putting object to s3\n" + e.getMessage());
+			throw new AWSS3ClientException("Error calling s3. " + e.getMessage());
 		}
 	}
 

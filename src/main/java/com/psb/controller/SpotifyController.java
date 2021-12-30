@@ -1,7 +1,11 @@
 package com.psb.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import com.psb.model.s3.S3Response;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.SerializationUtils;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +30,8 @@ public class SpotifyController {
 	private SpotifyClient spotifyClient;
 	private AWSS3Client s3Client;
 
+	private Logger logger = LoggerFactory.getLogger(SpotifyController.class);
+
 	@Autowired
 	public SpotifyController(SpotifyClient spotifyClient, AWSS3Client s3Client) {
 		this.spotifyClient = spotifyClient;
@@ -33,9 +39,10 @@ public class SpotifyController {
 	}
 
 	@PostMapping(path = "/playlists/save")
-	public void savePlaylists(@RequestHeader String oauthToken, @RequestBody  List<SpotifyPlaylist> playlists)
-			throws SpotifyClientUnauthorizedException, SpotifyClientException, AWSS3ClientException {
+	public List<S3Response> savePlaylists(@RequestHeader String oauthToken, @RequestBody  List<SpotifyPlaylist> playlists)
+			throws SpotifyClientUnauthorizedException, SpotifyClientException{
 		String folderPath = null;
+		List<S3Response> resp = new ArrayList<>();
 		for (SpotifyPlaylist playlist : playlists) {
 			if (folderPath == null) {
 				SpotifyUser user = spotifyClient.getUser(oauthToken);
@@ -45,13 +52,20 @@ public class SpotifyController {
 			String objectKey = folderPath + DELIMETER + playlist.getId();
 			SpotifyTracks tracks = spotifyClient.getPlaylistTracks(oauthToken, playlist);
 			S3Playlist s3Playlist = new S3Playlist(playlist, tracks);
-			saveToS3(objectKey, s3Playlist);
-
+			resp.add(saveToS3(objectKey, s3Playlist));
 		}
+		return resp;
 	}
 
-	private void saveToS3(String objectKey, S3Playlist playlist) throws AWSS3ClientException {
+	private S3Response saveToS3(String objectKey, S3Playlist playlist){
 		byte[] data = Compresser.compress(SerializationUtils.serialize(playlist));
-		s3Client.saveData(data, objectKey);
+		try {
+			return s3Client.saveData(data, objectKey);
+		} catch (AWSS3ClientException e){
+			logger.error(e.getMessage());
+			S3Response resp = new S3Response();
+			resp.setSuccess(false);
+			return resp;
+		}
 	}
 }

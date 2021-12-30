@@ -61,6 +61,7 @@ public class SpotifyClient {
 		SpotifyTracks tracks = new SpotifyTracks();
 		List<SpotifyTrack> tracksList = new ArrayList<>();
 		while (tracksUrl != null) {
+			logger.info("Fetching tracks at {}", tracksUrl);
 			SpotifyTracks tempTracks = client.get().uri(tracksUrl)
 					.headers(httpHeaders -> httpHeaders.setBearerAuth(oauthToken)).retrieve()
 					.onStatus(HttpStatus::isError, response -> {
@@ -72,15 +73,16 @@ public class SpotifyClient {
 					}).bodyToMono(SpotifyTracks.class).retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(2))).block();
 			if (tempTracks != null) {
 				tracksList.addAll(tempTracks.getTracks());
+				String firstTrack = tempTracks.getTracks().get(0).getName();
+				String lastTrack = tempTracks.getTracks().get(tempTracks.getTracks().size() - 1).getName();
+				logger.info("Tracks from {} to {} added", firstTrack, lastTrack);
+				logger.info("{} total tracks added", tempTracks.getTracks().size());
 				tracksUrl = tempTracks.getNext();
 			} else {
 				tracksUrl = null;
 			}
 		}
 		tracks.setTracks(tracksList);
-		for (SpotifyTrack spotifyTrack : tracks.getTracks()) {
-			logger.info("Track: {}", spotifyTrack.getName());
-		}
 		return tracks;
 	}
 

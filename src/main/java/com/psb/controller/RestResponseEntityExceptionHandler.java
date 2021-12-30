@@ -33,11 +33,4 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
 				HttpStatus.SERVICE_UNAVAILABLE);
 		return new ResponseEntity<>(res, HttpStatus.SERVICE_UNAVAILABLE);
 	}
-
-	@ExceptionHandler(value = { AWSS3ClientNotFoundException.class })
-	protected ResponseEntity<Object> handleS3Exception(AWSS3ClientNotFoundException ex, WebRequest request) {
-		ExceptionResponse res = new ExceptionResponse("Error calling S3 404 Not Found. " + ex.getMessage(),
-				HttpStatus.NOT_FOUND);
-		return new ResponseEntity<>(res, HttpStatus.NOT_FOUND);
-	}
 }

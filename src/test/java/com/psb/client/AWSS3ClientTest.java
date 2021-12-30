@@ -54,46 +54,5 @@ class AWSS3ClientTest {
 			s3Client.saveData(new byte[Constants.TEST_S3_RESPONSE_KB * 1024], "objectKey");
 		});
 	}
-	
-	@Test
-	void testGetPlaylist() {
-		// TODO find way to mock s3 response
-	}
-	
-	@Test
-	void testGetPlaylistNoSuchKeyException() {
-		when(s3.getObjectAsBytes(Mockito.any(GetObjectRequest.class))).thenThrow(NoSuchKeyException.class);
-		assertThrows(AWSS3ClientNotFoundException.class, () -> {
-			s3Client.getPlaylist("objectKey");
-		});
-	}
-	
-	@Test
-	void testGetPlaylists() {
-		// TODO find way to mock s3 response
-	}
-	
-	@Test
-	void testGetPlaylistsUserNotFound() {
-		ListObjectsResponse listObjects = ListObjectsResponse.builder().build();
-		// listObjects.contents() will return an empty list
-		when(s3.listObjects(Mockito.any(ListObjectsRequest.class))).thenReturn(listObjects);
-		assertThrows(AWSS3ClientNotFoundException.class, () -> {
-			s3Client.getPlaylists("Non existant user");
-		});
-	}
-	
-	@Test
-	void testGetAllUsers() {
-		// TODO find way to mock s3 response
-	}
-	
-	@Test
-	void testGetAllUsersException() {
-		when(s3.listObjects(Mockito.any(ListObjectsRequest.class))).thenThrow(AwsServiceException.class);
-		assertThrows(AWSS3ClientException.class, () -> {
-			s3Client.getAllUsers();
-		});
-	}
 
 }

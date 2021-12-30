@@ -14,10 +14,10 @@ public class SpotifyPlaylist implements Serializable {
 	private static final long serialVersionUID = -7982164757913098056L;
 	
 	private String name;
-	private String tracksUrl;
 	private List<SpotifyImage> images;
 	private String id;
-
+	private String tracksUrl;
+	
 	@JsonProperty("tracks")
 	private void unpackNested(Map<String, Object> tracks) {
 		this.tracksUrl = (String) tracks.get("href");

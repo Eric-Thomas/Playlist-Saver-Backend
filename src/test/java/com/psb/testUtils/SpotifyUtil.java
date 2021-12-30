@@ -11,7 +11,6 @@ import com.psb.model.spotify.SpotifyAlbum;
 import com.psb.model.spotify.SpotifyArtist;
 import com.psb.model.spotify.SpotifyImage;
 import com.psb.model.spotify.SpotifyPlaylist;
-import com.psb.model.spotify.SpotifyPlaylists;
 import com.psb.model.spotify.SpotifyTrack;
 import com.psb.model.spotify.SpotifyTracks;
 import com.psb.model.spotify.SpotifyUser;
@@ -35,38 +34,23 @@ public class SpotifyUtil {
 		this.mockServerUrl = url;
 	}
 
-	public List<SpotifyPlaylists> createTestPlaylistsWithPagination() {
-		List<SpotifyPlaylists> testPlaylistsList = new ArrayList<>();
-		for (int i = 0; i < PAGINATION_COUNT; i++) {
-			SpotifyPlaylists testPlaylists = new SpotifyPlaylists();
-			List<SpotifyPlaylist> playlists = new ArrayList<>();
-			playlists.add(createTestPlaylist());
-			testPlaylists.setPlaylists(playlists);
-			testPlaylists.setNext(mockServerUrl + Constants.TRACKS_URL);
-			testPlaylistsList.add(testPlaylists);
-		}
-		// Set last playlists next field to null to avoid infinite loop
-		testPlaylistsList.get(testPlaylistsList.size() - 1).setNext(null);
-		return testPlaylistsList;
-	}
-
-	public SpotifyPlaylists createTestPlaylists() {
-		SpotifyPlaylists testPlaylists = new SpotifyPlaylists();
-		List<SpotifyPlaylist> playlists = new ArrayList<>();
-		playlists.add(createTestPlaylist());
-		testPlaylists.setPlaylists(playlists);
-		return testPlaylists;
-	}
-
 	public SpotifyPlaylist createTestPlaylist() {
 		SpotifyPlaylist testPlaylist = new SpotifyPlaylist();
 		testPlaylist.setName(Constants.TEST_PLAYLIST_NAME);
-		testPlaylist.setTracksUrl(this.mockServerUrl + Constants.TRACKS_URL);
 		List<SpotifyImage> images = new ArrayList<>();
 		images.add(createTestImage());
 		testPlaylist.setImages(images);
 		testPlaylist.setId(Constants.TEST_PLAYLIST_ID);
+		testPlaylist.setTracksUrl(this.mockServerUrl + Constants.TRACKS_URL);
 		return testPlaylist;
+	}
+
+	public SpotifyImage createTestImage() {
+		SpotifyImage image = new SpotifyImage();
+		image.setHeight("500");
+		image.setWidth("500");
+		image.setUrl(Constants.TEST_PLAYLIST_IMAGE_URL);
+		return image;
 	}
 
 	public List<SpotifyTracks> createTestTracksWithPagination() {
@@ -102,14 +86,6 @@ public class SpotifyUtil {
 		testTrack.setUri("Test uri");
 		return testTrack;
 	}
-	
-	public SpotifyImage createTestImage() {
-		SpotifyImage image = new SpotifyImage();
-		image.setHeight("500");
-		image.setWidth("500");
-		image.setUrl(Constants.TEST_PLAYLIST_IMAGE_URL);
-		return image;
-	}
 
 	public SpotifyAlbum createTestAlbum() {
 		SpotifyAlbum testAlbum = new SpotifyAlbum();
@@ -133,36 +109,12 @@ public class SpotifyUtil {
 		return testUser;
 	}
 
-	public void addMockPlaylistsResponse(SpotifyPlaylists playlists, MockWebServer server) {
-		try {
-			server.enqueue(new MockResponse().setBody(this.objectMapper.writeValueAsString(playlists))
-					.addHeader("Content-Type", "application/json"));
-		} catch (JsonProcessingException e) {
-			e.printStackTrace();
-		}
-	}
-
 	public void addUnauthorizedResponse(MockWebServer server) {
 		server.enqueue(new MockResponse().setResponseCode(UNAUTHORIZED));
 	}
 
 	public void add5xxResponse(MockWebServer server) {
 		server.enqueue(new MockResponse().setResponseCode(503));
-	}
-
-	public void addMockPlaylistsPaginationResponses(List<SpotifyPlaylists> playlistsList, MockWebServer server) {
-		for (SpotifyPlaylists playlists : playlistsList) {
-			try {
-				server.enqueue(new MockResponse().setBody(this.objectMapper.writeValueAsString(playlists))
-						.addHeader("Content-Type", "application/json"));
-			} catch (JsonProcessingException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
-	public void addEmptyBodyResponse(MockWebServer server) {
-		server.enqueue(new MockResponse().addHeader("Content-Type", "application/json"));
 	}
 
 	public void addMockTracksResponse(SpotifyTracks tracks, MockWebServer server) {
@@ -183,6 +135,10 @@ public class SpotifyUtil {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	public void addEmptyBodyResponse(MockWebServer server) {
+		server.enqueue(new MockResponse().addHeader("Content-Type", "application/json"));
 	}
 
 	public void addMockUserResponse(SpotifyUser testUser, MockWebServer server) {

@@ -4,10 +4,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class PlaylistSaverBackendApplication {
+public class PlaylistSaverLambda {
 
 	public static void main(String[] args) {
-		SpringApplication.run(PlaylistSaverBackendApplication.class, args);
+		SpringApplication.run(PlaylistSaverLambda.class, args);
 	}
 
 }

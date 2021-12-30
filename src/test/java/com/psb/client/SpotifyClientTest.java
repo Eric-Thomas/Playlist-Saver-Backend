@@ -18,7 +18,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 import com.psb.exception.SpotifyClientException;
 import com.psb.exception.SpotifyClientUnauthorizedException;
 import com.psb.model.spotify.SpotifyPlaylist;
-import com.psb.model.spotify.SpotifyPlaylists;
 import com.psb.model.spotify.SpotifyTrack;
 import com.psb.model.spotify.SpotifyTracks;
 import com.psb.model.spotify.SpotifyUser;
@@ -53,57 +52,6 @@ class SpotifyClientTest {
 		// class under test
 		ReflectionTestUtils.setField(spotifyClient, "basePlaylistsUrl", "/");
 		ReflectionTestUtils.setField(spotifyClient, "userInfoUrl", "/");
-	}
-
-	@Test
-	void testGetPlaylistsNoPagination() throws SpotifyClientException, SpotifyClientUnauthorizedException {
-		SpotifyPlaylists testPlaylists = spotifyUtil.createTestPlaylists();
-		spotifyUtil.addMockPlaylistsResponse(testPlaylists, mockSpotifyServer);
-		SpotifyPlaylists clientPlaylists = spotifyClient.getPlaylists("oauthToken");
-		assertEquals(testPlaylists, clientPlaylists);
-	}
-
-	@Test
-	void testGetPlaylistsWithPagination() throws SpotifyClientException, SpotifyClientUnauthorizedException {
-		List<SpotifyPlaylists> testPlaylistsList = spotifyUtil.createTestPlaylistsWithPagination();
-		SpotifyPlaylists testPlaylists = combinePlaylistsList(testPlaylistsList);
-		spotifyUtil.addMockPlaylistsPaginationResponses(testPlaylistsList, mockSpotifyServer);
-		SpotifyPlaylists clientPlaylists = spotifyClient.getPlaylists("oauthToken");
-		assertEquals(testPlaylists, clientPlaylists);
-		assertEquals(testPlaylists.getPlaylists().size(), clientPlaylists.getPlaylists().size());
-	}
-
-	private SpotifyPlaylists combinePlaylistsList(List<SpotifyPlaylists> list) {
-		SpotifyPlaylists spotifyPlaylists = new SpotifyPlaylists();
-		List<SpotifyPlaylist> playlistList = new ArrayList<>();
-		for (SpotifyPlaylists playlists : list) {
-			playlistList.addAll(playlists.getPlaylists());
-		}
-		spotifyPlaylists.setPlaylists(playlistList);
-		return spotifyPlaylists;
-	}
-
-	@Test
-	void testGetPlaylistsNull() throws SpotifyClientException, SpotifyClientUnauthorizedException {
-		spotifyUtil.addEmptyBodyResponse(mockSpotifyServer);
-		SpotifyPlaylists clientPlaylists = spotifyClient.getPlaylists("oauthToken");
-		assertTrue(clientPlaylists.getPlaylists().isEmpty());
-	}
-
-	@Test
-	void testGetPlaylistsUnauthorized() {
-		spotifyUtil.addUnauthorizedResponse(mockSpotifyServer);
-		assertThrows(SpotifyClientUnauthorizedException.class, () -> {
-			spotifyClient.getPlaylists("oauthToken");
-		});
-	}
-
-	@Test
-	void testGetPlaylists5xxError() {
-		spotifyUtil.add5xxResponse(mockSpotifyServer);
-		assertThrows(SpotifyClientException.class, () -> {
-			spotifyClient.getPlaylists("oauthToken");
-		});
 	}
 
 	@Test
@@ -167,14 +115,14 @@ class SpotifyClientTest {
 			spotifyClient.getPlaylistTracks("oauthToken", playlist);
 		});
 	}
-	
+
 	@Test
 	void testGetUser() throws SpotifyClientUnauthorizedException, SpotifyClientException {
 		SpotifyUser testUser = spotifyUtil.createTestUser();
 		spotifyUtil.addMockUserResponse(testUser, mockSpotifyServer);
 		assertEquals(testUser, spotifyClient.getUser("oauth"));
 	}
-	
+
 	@Test
 	void testGetUsernameUnauthorized() {
 		spotifyUtil.addUnauthorizedResponse(mockSpotifyServer);
@@ -182,7 +130,7 @@ class SpotifyClientTest {
 			spotifyClient.getUser("oauthToken");
 		});
 	}
-	
+
 	@Test
 	void testGetUsername5xxError() {
 		spotifyUtil.add5xxResponse(mockSpotifyServer);

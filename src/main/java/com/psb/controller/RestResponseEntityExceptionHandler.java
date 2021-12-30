@@ -1,6 +1,5 @@
 package com.psb.controller;
 
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -17,27 +16,28 @@ import com.psb.exception.SpotifyClientUnauthorizedException;
 public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
 
 	@ExceptionHandler(value = { SpotifyClientUnauthorizedException.class })
-	protected ResponseEntity<Object> handleWebClientConflict(SpotifyClientUnauthorizedException ex,
-			WebRequest request) {
-		String bodyOfResponse = "Error calling spotify api. " + ex.getMessage();
-		return handleExceptionInternal(ex, bodyOfResponse, new HttpHeaders(), HttpStatus.UNAUTHORIZED, request);
-	}
-
-	@ExceptionHandler(value = { AWSS3ClientException.class })
-	protected ResponseEntity<Object> handleS3Exception(AWSS3ClientException ex, WebRequest request) {
-		String bodyOfResponse = "Error calling S3. Try again later. " + ex.getMessage();
-		return handleExceptionInternal(ex, bodyOfResponse, new HttpHeaders(), HttpStatus.SERVICE_UNAVAILABLE, request);
-	}
-	
-	@ExceptionHandler(value = { AWSS3ClientNotFoundException.class })
-	protected ResponseEntity<Object> handleS3Exception(AWSS3ClientNotFoundException ex, WebRequest request) {
-		String bodyOfResponse = "Error calling S3 404 Not Found. " + ex.getMessage();
-		return handleExceptionInternal(ex, bodyOfResponse, new HttpHeaders(), HttpStatus.NOT_FOUND, request);
+	public ResponseEntity<Object> handleUnauthorizedException(SpotifyClientUnauthorizedException e) {
+		ExceptionResponse res = new ExceptionResponse(e.getMessage(), HttpStatus.UNAUTHORIZED);
+		return new ResponseEntity<>(res, HttpStatus.UNAUTHORIZED);
 	}
 
 	@ExceptionHandler(value = { SpotifyClientException.class })
-	protected ResponseEntity<Object> handleSpotifyException(SpotifyClientException ex, WebRequest request) {
-		String bodyOfResponse = "Error calling spotify api. " + ex.getMessage();
-		return handleExceptionInternal(ex, bodyOfResponse, new HttpHeaders(), HttpStatus.SERVICE_UNAVAILABLE, request);
+	public ResponseEntity<Object> handleClientException(SpotifyClientException e) {
+		ExceptionResponse res = new ExceptionResponse(e.getMessage(), HttpStatus.SERVICE_UNAVAILABLE);
+		return new ResponseEntity<>(res, HttpStatus.SERVICE_UNAVAILABLE);
+	}
+
+	@ExceptionHandler(value = { AWSS3ClientException.class })
+	protected ResponseEntity<Object> handleS3Exception(AWSS3ClientException ex) {
+		ExceptionResponse res = new ExceptionResponse("Error calling S3. Try again later. " + ex.getMessage(),
+				HttpStatus.SERVICE_UNAVAILABLE);
+		return new ResponseEntity<>(res, HttpStatus.SERVICE_UNAVAILABLE);
+	}
+
+	@ExceptionHandler(value = { AWSS3ClientNotFoundException.class })
+	protected ResponseEntity<Object> handleS3Exception(AWSS3ClientNotFoundException ex, WebRequest request) {
+		ExceptionResponse res = new ExceptionResponse("Error calling S3 404 Not Found. " + ex.getMessage(),
+				HttpStatus.NOT_FOUND);
+		return new ResponseEntity<>(res, HttpStatus.NOT_FOUND);
 	}
 }

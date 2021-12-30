@@ -16,7 +16,7 @@ Resources:
       CodeUri: .
       MemorySize: 512
       Policies: AWSLambdaBasicExecutionRole
-      Timeout: 60
+      Timeout: 600
       Events:
         HttpApiEvent:
           Type: HttpApi
@@ -29,4 +29,4 @@ Outputs:
     Description: URL for application
     Value: !Sub 'https://${ServerlessHttpApi}.execute-api.${AWS::Region}.amazonaws.com'
     Export:
-      Name: API
+      Name: playlist-saver-lambda

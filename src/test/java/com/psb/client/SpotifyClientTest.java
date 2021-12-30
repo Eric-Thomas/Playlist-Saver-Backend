@@ -48,9 +48,8 @@ class SpotifyClientTest {
 		WebClient client = WebClient.create(baseUrl);
 		spotifyClient = new SpotifyClient(client);
 		spotifyUtil.setMockServerUrl(baseUrl);
-		// Sets playlists url since it is a value drawn from properties file in the
+		// Sets userInfo url since it is a value drawn from properties file in the
 		// class under test
-		ReflectionTestUtils.setField(spotifyClient, "basePlaylistsUrl", "/");
 		ReflectionTestUtils.setField(spotifyClient, "userInfoUrl", "/");
 	}
 

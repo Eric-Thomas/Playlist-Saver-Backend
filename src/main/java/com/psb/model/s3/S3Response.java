@@ -5,8 +5,10 @@ import lombok.Data;
 @Data
 public class S3Response {
 
-	private int kilobytes;
-	private String result;
+	private int bytes;
+	private String eTag;
 	private boolean success;
+	private String bucket;
+	private String objectKey;
 
 }
